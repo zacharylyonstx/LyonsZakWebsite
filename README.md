@@ -2,7 +2,7 @@
 
 **An interactive self-portrait of Zak Lyons, senior software engineer** — built as a scroll-driven film. Scrolling is the only control: eight scenes travel through his work and his life, each opened by one of his own photographs given real depth, and a backyard photograph turns into a playable 3D neighborhood he built for his kids. It is a portfolio in the sense that the site itself is the proof of work.
 
-**Live:** _deploying — link lands here once the first deploy is up_
+**Live:** [lyonszak.netlify.app](https://lyonszak.netlify.app) · Source: [github.com/zacharylyonstx/LyonsZakWebsite](https://github.com/zacharylyonstx/LyonsZakWebsite)
 
 ---
 
