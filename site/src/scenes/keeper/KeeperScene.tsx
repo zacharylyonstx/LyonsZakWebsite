@@ -483,7 +483,17 @@ export function KeeperEndCard({ timeline }: { timeline: ScrollTimeline | null })
           </p>
         )}
         <hr className="end-rule" aria-hidden="true" />
+        {/* The plain facts, in full — the one place in the film they appear as
+            text: the legal name (most people say Zak), where, and how to
+            reach him. Real content for a real reader; also what a search
+            engine indexes this page by. */}
+        <p className="end-identity">
+          Zachary Alan Lyons &middot; Senior software engineer &middot; Georgetown, Texas
+        </p>
         <ul className="end-contact">
+          <li>
+            <a href="tel:+15124972838">(512) 497-2838</a>
+          </li>
           <li>
             <a href="mailto:zacharylyonstx@gmail.com">zacharylyonstx@gmail.com</a>
           </li>

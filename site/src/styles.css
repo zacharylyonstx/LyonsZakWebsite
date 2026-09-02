@@ -1491,3 +1491,14 @@ body {
     display: inline;
   }
 }
+
+/* The end card's plain-facts line (2026-09-02): full name, role, place —
+   the film's one line of literal identity text, set quiet under the rule. */
+.end-identity {
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--smoke);
+}
