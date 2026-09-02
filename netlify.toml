@@ -1,0 +1,21 @@
+# LyonsZak.com — Netlify build. The site lives in site/; a static Vite build.
+[build]
+  base = "site"
+  command = "npm ci && npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# The fast lane's clean URLs (/resume -> resume.html etc.) are Netlify's
+# default pretty-URL behavior; 404.html is served for unmatched routes.
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

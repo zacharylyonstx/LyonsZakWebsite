@@ -1,0 +1,13 @@
+# Anchored to site/.
+/node_modules/
+/dist/
+/tsconfig.tsbuildinfo
+
+# public/ is committed in full: every asset the film needs (graded photos,
+# depth maps, the RTC world models, the ambient loops, fonts, ship metadata)
+# so a clone builds and deploys with `npm ci && npm run build` and nothing
+# else. Assets are staged from the private .recon/ sources by
+# scripts/prepare-assets.mjs; re-run it after changing a source.
+
+# macOS
+.DS_Store

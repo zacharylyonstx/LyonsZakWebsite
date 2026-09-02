@@ -1,0 +1,620 @@
+/* Fast-lane pages — /resume /experience /projects /contact.
+   Static HTML, zero JS. Calm, printable, readable — restyled to the v2
+   tokens (docs/v2-direction.md): dusk ground (never flat black), bone type,
+   amber accents, Newsreader for the reading voice, Bricolage for identity.
+   No cards-and-shadows kitsch — this is meant to read as "this person has
+   taste and nothing to hide." Content markup is untouched from v1. */
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-display: swap;
+  src: url('/fonts/bricolage-grotesque-latin-wdth-var.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/newsreader-latin-var.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/newsreader-italic-latin-var.woff2') format('woff2');
+}
+
+:root {
+  --bg: #171e2e; /* --dusk */
+  --bg-deep: #0d1120;
+  --surface: #1d2536;
+  --ink: #f0e9dc; /* --bone */
+  --ink-muted: #97a0b5; /* --smoke */
+  --ink-faint: #8891a8; /* 5.3:1 on --bg — passes WCAG AA for normal text */
+  --accent: #f5a45c; /* --amber — hover/current/focus, used sparingly */
+  --rule: rgba(240, 233, 220, 0.14);
+  --link: #f0e9dc;
+  --link-visited: #d9d0c0;
+  --focus: #f5a45c;
+  --font-display:
+    'Bricolage Grotesque', 'Avenir Next Condensed', 'Helvetica Neue', Arial,
+    sans-serif;
+  --font-serif: 'Newsreader', Georgia, 'Iowan Old Style', serif;
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Helvetica Neue', Arial,
+    sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+  --measure: 42rem;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f6f2ea; /* warm paper, not clinical white */
+    --bg-deep: #efeadf;
+    --surface: #ffffff;
+    --ink: #1d2433; /* dusk as ink */
+    --ink-muted: #545e73;
+    --ink-faint: #616b80; /* AA on the light --bg */
+    --accent: #a35f1d; /* burnt amber — the accent, grounded for light */
+    --rule: rgba(29, 36, 51, 0.16);
+    --link: #1d2433;
+    --link-visited: #3c4356;
+    --focus: #a35f1d;
+    color-scheme: light;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  /* The journey's blue hour, quieted: a barely-there vertical drift so the
+     page never reads as one flat slab. Fixed so long pages stay calm. */
+  background-color: var(--bg);
+  background-image: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg) 34%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg-deep);
+}
+
+.fl-skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 10px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+}
+
+.fl-skip-link:focus {
+  left: 16px;
+  top: 16px;
+}
+
+a {
+  color: var(--link);
+}
+
+a:visited {
+  color: var(--link-visited);
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---- Header -------------------------------------------------------------- */
+
+.fl-header {
+  padding: 40px 28px 28px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.fl-header-inner {
+  max-width: var(--measure);
+  margin: 0 auto;
+}
+
+.fl-back {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  text-decoration: none;
+  margin-bottom: 24px;
+}
+
+.fl-back:hover {
+  color: var(--accent);
+}
+
+.fl-identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  margin: 0 0 22px;
+}
+
+.fl-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 640;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.fl-role {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 15px;
+  letter-spacing: 0.01em;
+  color: var(--ink-muted);
+}
+
+.fl-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 26px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.fl-nav a {
+  color: var(--ink-muted);
+  text-decoration: none;
+  padding: 2px 1px;
+  border-bottom: 1px solid transparent;
+}
+
+.fl-nav a:hover {
+  color: var(--accent);
+}
+
+.fl-nav a[aria-current='page'] {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+/* ---- Page heading --------------------------------------------------------- */
+
+.fl-page-heading {
+  max-width: var(--measure);
+  margin: 44px auto 6px;
+  padding: 0 28px;
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+}
+
+.fl-page-lede {
+  max-width: var(--measure);
+  margin: 0 auto 36px;
+  padding: 0 28px;
+  font-style: italic;
+  color: var(--ink-muted);
+  font-size: 16px;
+}
+
+/* ---- Main content ---------------------------------------------------------- */
+
+.fl-main {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 0 28px 96px;
+}
+
+.fl-section {
+  margin: 0 0 44px;
+}
+
+.fl-section:last-child {
+  margin-bottom: 0;
+}
+
+.fl-section-heading {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin: 0 0 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.fl-summary {
+  font-size: 17.5px;
+  line-height: 1.7;
+  margin: 0;
+  max-width: 38rem;
+}
+
+.fl-entry {
+  margin: 0 0 30px;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.fl-entry:last-child {
+  margin-bottom: 0;
+}
+
+.fl-entry-title {
+  font-size: 17.5px;
+  font-weight: 600;
+  margin: 0 0 2px;
+}
+
+.fl-entry-meta {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  letter-spacing: 0.015em;
+  color: var(--ink-muted);
+  margin: 0 0 10px;
+}
+
+.fl-bullets {
+  margin: 0;
+  padding-left: 1.15em;
+  font-size: 16px;
+  line-height: 1.62;
+}
+
+.fl-bullets li {
+  margin: 0 0 8px;
+}
+
+.fl-bullets li:last-child {
+  margin-bottom: 0;
+}
+
+.fl-bullets li::marker {
+  color: var(--ink-faint);
+}
+
+.fl-contact-line {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 0;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  color: var(--ink-muted);
+}
+
+.fl-contact-line li {
+  display: flex;
+  align-items: center;
+}
+
+.fl-contact-line li + li::before {
+  content: '·';
+  margin: 0 10px;
+  color: var(--accent);
+}
+
+.fl-contact-line a {
+  color: var(--ink-muted);
+  text-decoration: none;
+}
+
+.fl-contact-line a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.fl-skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 18px 32px;
+  margin: 0;
+}
+
+.fl-skills-grid dt {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin: 0 0 5px;
+}
+
+.fl-skills-grid dd {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.55;
+}
+
+.fl-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  align-items: center;
+  margin: 4px 0 0;
+}
+
+.fl-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.fl-download:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.fl-print-hint {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-style: normal;
+  color: var(--ink-faint);
+}
+
+/* ---- Contact page specifics ------------------------------------------------ */
+
+.fl-contact-card {
+  max-width: 30rem;
+}
+
+.fl-contact-card dt {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin: 0 0 4px;
+}
+
+.fl-contact-card dd {
+  margin: 0 0 22px;
+  font-size: 18px;
+}
+
+.fl-contact-card dd:last-child {
+  margin-bottom: 0;
+}
+
+.fl-contact-card a {
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+}
+
+.fl-contact-card a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ---- Projects page specifics ------------------------------------------------ */
+
+.fl-project {
+  margin: 0 0 40px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.fl-project:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.fl-project-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.fl-project-meta {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+  margin: 0 0 14px;
+}
+
+.fl-project p {
+  margin: 0 0 14px;
+  font-size: 16.5px;
+  line-height: 1.68;
+  max-width: 38rem;
+}
+
+.fl-project p:last-child {
+  margin-bottom: 0;
+}
+
+.fl-project a.fl-project-link {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+}
+
+.fl-project a.fl-project-link:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+@media (max-width: 560px) {
+  .fl-header {
+    padding: 28px 20px 22px;
+  }
+
+  .fl-page-heading {
+    padding: 0 20px;
+    margin-top: 32px;
+  }
+
+  .fl-page-lede {
+    padding: 0 20px;
+  }
+
+  .fl-main {
+    padding: 0 20px 72px;
+  }
+}
+
+/* ---- Print --------------------------------------------------------------- */
+
+@media print {
+  @page {
+    margin: 0.6in;
+  }
+
+  html,
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 10.5pt;
+    line-height: 1.4;
+  }
+
+  .fl-header,
+  .fl-actions,
+  .fl-print-hint {
+    display: none !important;
+  }
+
+  .fl-page-heading,
+  .fl-page-lede,
+  .fl-main {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .fl-page-heading {
+    margin-bottom: 4px;
+    font-size: 17px;
+  }
+
+  .fl-page-lede {
+    margin-bottom: 14px;
+    font-size: 10pt;
+  }
+
+  a {
+    color: #000;
+    text-decoration: none;
+  }
+
+  .fl-section-heading {
+    color: #000;
+    border-bottom-color: #000;
+    font-size: 9.5pt;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+  }
+
+  .fl-entry-meta,
+  .fl-contact-line,
+  .fl-skills-grid dt {
+    color: #333;
+  }
+
+  .fl-summary,
+  .fl-bullets,
+  .fl-skills-grid dd {
+    font-size: 10pt;
+    line-height: 1.42;
+  }
+
+  .fl-entry-title {
+    font-size: 10.5pt;
+  }
+
+  .fl-entry-meta {
+    font-size: 9pt;
+    margin-bottom: 5px;
+  }
+
+  .fl-bullets li {
+    margin-bottom: 3px;
+  }
+
+  .fl-section {
+    margin-bottom: 12px;
+  }
+
+  .fl-entry {
+    margin-bottom: 11px;
+  }
+
+  .fl-skills-grid {
+    gap: 8px 24px;
+  }
+
+  /* Pagination: let long entries flow across a page break (a full block
+     avoid on a 7-bullet entry starves the rest of the page above it) —
+     but never orphan a title/meta from the bullets that follow it, and
+     never split a single bullet's text mid-sentence across the break. */
+  .fl-entry {
+    page-break-inside: auto;
+    break-inside: auto;
+  }
+
+  .fl-entry-title,
+  .fl-entry-meta {
+    break-after: avoid-page;
+  }
+
+  .fl-bullets li {
+    break-inside: avoid-page;
+  }
+
+  .fl-section-heading {
+    break-after: avoid-page;
+  }
+}

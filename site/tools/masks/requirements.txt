@@ -1,0 +1,5 @@
+# G1.1 Task 4 mask pipeline — classical segmentation + hand-authored fixes only.
+# torch/ML models deliberately NOT required (see task brief): depth thresholds,
+# color keys, and hand-drawn polygon corrections cover this single locked photo.
+Pillow==10.4.0
+numpy==2.4.4

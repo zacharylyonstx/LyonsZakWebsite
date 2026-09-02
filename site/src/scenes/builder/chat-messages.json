@@ -1,0 +1,15 @@
+{
+  "imageWidth": 3024,
+  "imageHeight": 1980,
+  "messages": [
+    { "id": "u1", "left": 1752, "top": 564, "width": 820, "height": 158 },
+    { "id": "k1", "left": 1618, "top": 820, "width": 902, "height": 152 },
+    { "id": "chip", "left": 2242, "top": 984, "width": 330, "height": 74 },
+    { "id": "u2", "left": 2324, "top": 1058, "width": 248, "height": 100 },
+    { "id": "t1", "left": 1615, "top": 1183, "width": 822, "height": 71 },
+    { "id": "k2", "left": 1618, "top": 1356, "width": 902, "height": 196 },
+    { "id": "u3", "left": 1756, "top": 1570, "width": 816, "height": 196 },
+    { "id": "t2", "left": 1615, "top": 1784, "width": 895, "height": 77 },
+    { "id": "t3", "left": 1615, "top": 1886, "width": 895, "height": 94 }
+  ]
+}

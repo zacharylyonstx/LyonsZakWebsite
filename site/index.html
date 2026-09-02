@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Zak Lyons — senior software engineer. A scroll film in seven scenes." />
+    <meta name="theme-color" content="#171e2e" />
+    <!-- The amber-rule-on-dusk mark (docs/v2-direction.md's own signature
+         device, not initials-in-a-circle) — SVG primary, PNG fallbacks for
+         browsers/contexts that don't resolve an SVG favicon, apple-touch-icon
+         for home-screen saves. Source: public/favicon.svg, rasterized by
+         scripts/ship-assets.mjs. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="canonical" href="https://lyonszak.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://lyonszak.com/" />
+    <meta property="og:site_name" content="Zak Lyons" />
+    <meta property="og:title" content="Zak Lyons — Senior Software Engineer" />
+    <meta
+      property="og:description"
+      content="A scroll film about a Texas engineer who builds things — software, mostly. Also everything else."
+    />
+    <meta property="og:image" content="https://lyonszak.com/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Zak Lyons — Senior Software Engineer" />
+    <meta
+      name="twitter:description"
+      content="A scroll film about a Texas engineer who builds things — software, mostly. Also everything else."
+    />
+    <meta name="twitter:image" content="https://lyonszak.com/og-image.jpg" />
+    <title>Zak Lyons — Senior Software Engineer</title>
+    <!-- Self-hosted variable faces (OFL — public/fonts/ATTRIBUTION.md).
+         The display face and the voice italic are both on screen at first
+         paint, so both are preloaded; swap keeps the fallback stack visible
+         in the meantime. -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/bricolage-grotesque-latin-wdth-var.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/newsreader-italic-latin-var.woff2"
+      crossorigin
+    />
+    <!-- No image preloads, deliberately (integration pass, measured on a
+         Fast-3G profile): preloading the opening portrait+depth moved them
+         ~12.6s -> ~6.8s but pushed time-to-scrollable 3.9s -> 6.8s — the
+         hints share the pipe with the app JS, and the film's only verb
+         waits. The static title card IS the first frame; the portrait
+         fades in when ready (the settle), so the honest order is
+         JS-first. -->
+    <style>
+      /* Critical pre-JS frame — the proven v1 pattern under the v2 look
+         (docs/v2-direction.md): identity must not wait for React. The #root
+         markup below renders the dusk ground, the fast lane, and the title
+         card statically at FIRST PAINT; React's first commit replaces it
+         with identical live markup (same class names, same rules).
+
+         Every rule here is a deliberate COPY of the canonical rules in
+         src/styles.css — change them there, mirror them here (and vice
+         versa). Everything else lives in src/styles.css only. */
+      @font-face {
+        font-family: 'Bricolage Grotesque';
+        font-style: normal;
+        font-weight: 200 800;
+        font-stretch: 75% 100%;
+        font-display: swap;
+        src: url('/fonts/bricolage-grotesque-latin-wdth-var.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Newsreader';
+        font-style: italic;
+        font-weight: 200 800;
+        font-display: swap;
+        src: url('/fonts/newsreader-italic-latin-var.woff2') format('woff2');
+      }
+      :root {
+        color-scheme: dark;
+        --journey-length: 17200px;
+        --dusk: #171e2e;
+        --dusk-deep: #0d1120;
+        --dusk-lift: #2a3552;
+        --amber: #f5a45c;
+        --bone: #f0e9dc;
+        --smoke: #97a0b5;
+        --font-display:
+          'Bricolage Grotesque', 'Avenir Next Condensed', 'Helvetica Neue',
+          Arial, sans-serif;
+        --font-voice: 'Newsreader', Georgia, 'Iowan Old Style', serif;
+        --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--dusk);
+      }
+      body {
+        color: var(--bone);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      ::selection {
+        background: var(--amber);
+        color: var(--dusk-deep);
+      }
+      .ground {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            95% 52% at 66% 103%,
+            rgba(245, 164, 92, 0.16) 0%,
+            rgba(245, 164, 92, 0.05) 42%,
+            rgba(245, 164, 92, 0) 72%
+          ),
+          linear-gradient(
+            180deg,
+            var(--dusk-deep) 0%,
+            #121828 38%,
+            var(--dusk) 60%,
+            #1f2740 84%,
+            var(--dusk-lift) 100%
+          );
+      }
+      .fastlane {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 10;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px 28px;
+        padding: 26px 34px 44px;
+        background: linear-gradient(
+          to bottom,
+          rgba(13, 17, 32, 0.82) 0%,
+          rgba(13, 17, 32, 0.45) 55%,
+          rgba(13, 17, 32, 0) 100%
+        );
+      }
+      .fastlane-identity {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        min-width: 0;
+      }
+      .fastlane-name {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: 17px;
+        font-weight: 640;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--bone);
+        white-space: nowrap;
+      }
+      .fastlane-role {
+        margin: 0;
+        font-family: var(--font-voice);
+        font-style: italic;
+        font-size: 14.5px;
+        letter-spacing: 0.015em;
+        color: var(--smoke);
+        white-space: nowrap;
+      }
+      .fastlane-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 26px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+      }
+      .fastlane-nav a {
+        color: var(--smoke);
+        text-decoration: none;
+        padding: 2px 1px;
+        transition: color 140ms ease;
+      }
+      .fastlane-nav a:hover {
+        color: var(--amber);
+      }
+      .fastlane-nav a:focus-visible {
+        color: var(--amber);
+        outline: 2px solid var(--amber);
+        outline-offset: 4px;
+        border-radius: 2px;
+      }
+      .name-display {
+        position: fixed;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 0 clamp(22px, 5.5vw, 92px);
+        pointer-events: none;
+        will-change: transform, opacity;
+      }
+      .name-words {
+        margin: 0;
+        font-family: var(--font-display);
+        font-weight: 748;
+        font-stretch: 80%;
+        font-variation-settings: 'opsz' 96;
+        font-size: clamp(4.2rem, 15vw, 16.5rem);
+        line-height: 0.86;
+        letter-spacing: -0.008em;
+        text-transform: uppercase;
+        color: var(--bone);
+        text-shadow: 0 2px 26px rgba(13, 17, 32, 0.38);
+        pointer-events: auto;
+        user-select: text;
+      }
+      .nw-line {
+        display: block;
+      }
+      .nw-line2 {
+        margin-left: 1.5em;
+      }
+      .name-tag {
+        margin: clamp(20px, 3.2vh, 38px) 0 0 8px;
+      }
+      .name-rule {
+        width: clamp(40px, 5vw, 64px);
+        height: 2px;
+        margin: 0;
+        background: linear-gradient(90deg, var(--amber), rgba(245, 164, 92, 0));
+        border: none;
+      }
+      .name-voice {
+        margin: clamp(12px, 1.8vh, 20px) 0 0 0;
+        font-family: var(--font-voice);
+        font-style: italic;
+        font-weight: 420;
+        font-size: clamp(1.15rem, 2.1vw, 1.6rem);
+        letter-spacing: 0.005em;
+        color: var(--bone);
+        text-shadow: 0 1px 14px rgba(13, 17, 32, 0.7);
+        pointer-events: auto;
+        user-select: text;
+      }
+      .scroll-cue {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 26px;
+        z-index: 2;
+        text-align: center;
+        font-family: var(--font-mono);
+        font-size: 10px;
+        letter-spacing: 0.42em;
+        text-indent: 0.42em;
+        text-transform: uppercase;
+        color: var(--smoke);
+        pointer-events: none;
+      }
+      @media (max-width: 620px) {
+        .fastlane {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+          padding: 20px 22px 36px;
+        }
+        .fastlane-identity {
+          flex-direction: column;
+          gap: 2px;
+        }
+        .fastlane-nav {
+          font-size: 10px;
+          letter-spacing: 0.15em;
+          gap: 6px 18px;
+        }
+      }
+      @media (max-aspect-ratio: 21/20), (max-width: 719px) {
+        .name-display {
+          justify-content: flex-start;
+          padding-top: clamp(96px, 15vh, 150px);
+        }
+        .name-words {
+          font-size: clamp(3.8rem, 24vw, 8rem);
+        }
+        .nw-line2 {
+          margin-left: 0.92em;
+        }
+        .name-tag {
+          position: absolute;
+          left: clamp(22px, 5.5vw, 92px);
+          bottom: clamp(64px, 11vh, 120px);
+          margin: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <!-- Static pre-render of the first frame's identity (see the critical
+           CSS note above). React replaces it wholesale on its first commit.
+           The links are real and work before any JS runs. -->
+      <div class="ground" aria-hidden="true"></div>
+      <header class="fastlane">
+        <div class="fastlane-identity">
+          <p class="fastlane-name">Zak Lyons</p>
+          <p class="fastlane-role">Senior Software Engineer</p>
+        </div>
+        <nav class="fastlane-nav" aria-label="Professional">
+          <a href="/resume">Resume</a>
+          <a href="/experience">Experience</a>
+          <a href="/projects">Projects</a>
+          <a href="/contact">Contact</a>
+        </nav>
+      </header>
+      <div class="name-display">
+        <h1 class="name-words">
+          <span class="nw-line">Zak</span><span class="nw-line nw-line2">Lyons</span>
+        </h1>
+        <div class="name-tag">
+          <hr class="name-rule" aria-hidden="true" />
+          <p class="name-voice">Senior software engineer. Texas.</p>
+        </div>
+      </div>
+      <div class="scroll-cue" aria-hidden="true">Scroll</div>
+    </div>
+    <noscript>
+      <div style="position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 16px 34px; color: #97a0b5; background: rgba(13, 17, 32, 0.85); font: 13px/1.5 ui-sans-serif, system-ui, sans-serif">
+        The film needs JavaScript — the links above work without it.
+      </div>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

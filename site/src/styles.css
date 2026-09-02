@@ -1,0 +1,1493 @@
+/* LyonsZak.com v2 — the shell's canonical stylesheet.
+   Design contract: docs/v2-direction.md. The site lives at Texas blue hour —
+   warm point-light against photographic indigo. NEVER flat black.
+
+   The token system below is the one source of truth for the whole site.
+   index.html carries a deliberate COPY of the critical first-paint rules
+   (ground, fastlane, name display) so identity renders before any JS — if a
+   rule changes here, mirror it there (and vice versa). */
+
+/* ---- Self-hosted fonts (OFL — see public/fonts/ATTRIBUTION.md) ---------- */
+/* Variable faces, latin subset. Display face is preloaded in index.html. */
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-display: swap;
+  src: url('/fonts/bricolage-grotesque-latin-wdth-var.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/newsreader-latin-var.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/newsreader-italic-latin-var.woff2') format('woff2');
+}
+
+/* ---- Tokens (docs/v2-direction.md, verbatim palette) --------------------- */
+
+:root {
+  color-scheme: dark;
+
+  /* The film's length. Retuned in the integration pass (10000 -> 15000, the
+     v1 9000 -> 14400 precedent): the crossing needed room to breathe.
+     Mirrored in index.html's critical CSS — change both together. */
+  --journey-length: 17200px;
+
+  /* Palette. --dusk is the ground the whole film sits on. */
+  --dusk: #171e2e; /* blue-hour ground — photographic indigo, never black */
+  --dusk-deep: #0d1120; /* top of the sky, furthest from the horizon */
+  --dusk-lift: #2a3552; /* the lighter band just above the horizon */
+  --amber: #f5a45c; /* sparkler/candle warmth — the light accent */
+  --bone: #f0e9dc; /* type on dark */
+  --flag: #b3282d; /* Texas-flag red — rare, deliberate */
+  --smoke: #97a0b5; /* secondary text */
+
+  /* Type. Display set big/tight/sparingly; voice lines read as spoken. */
+  --font-display:
+    'Bricolage Grotesque', 'Avenir Next Condensed', 'Helvetica Neue', Arial,
+    sans-serif;
+  --font-voice: 'Newsreader', Georgia, 'Iowan Old Style', serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Helvetica Neue', Arial,
+    sans-serif;
+}
+
+/* ---- Base ---------------------------------------------------------------- */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  /* Overscroll and pre-paint show dusk, never a browser default. */
+  background: var(--dusk);
+}
+
+body {
+  color: var(--bone);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--amber);
+  color: var(--dusk-deep);
+}
+
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Visually hidden but still reachable by assistive tech — the standard
+   clip-based technique (not display:none/visibility:hidden, which would
+   remove it from the accessibility tree too). Used for supplementary
+   descriptions (e.g. sound-toggle's aria-describedby target) that
+   shouldn't duplicate as VISIBLE text. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Layers (bottom to top) ----------------------------------------------
+   .ground   z 0   the dusk gradient — the film's connective tissue
+   .stage    z 1   the fixed R3F canvas (clears transparent over the ground;
+                   a scene that owns the frame raises its own clearAlpha)
+   .scene    z 2   DOM scene layers
+   .subtitle z 3   the voice-line lower third
+   .grain    z 4   film grain — over the world, under the UI chrome
+   .fastlane z 10  the quiet professional lane
+   .debug    z 20  ?debug=1 readout only
+--------------------------------------------------------------------------- */
+
+/* The dusk ground: night deepest at the top, the sky lifting toward the
+   horizon at the bottom of the frame, with a faint warm bloom low and
+   centered — the last light, or a porch light two streets over. */
+.ground {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      95% 52% at 66% 103%,
+      rgba(245, 164, 92, 0.16) 0%,
+      rgba(245, 164, 92, 0.05) 42%,
+      rgba(245, 164, 92, 0) 72%
+    ),
+    linear-gradient(
+      180deg,
+      var(--dusk-deep) 0%,
+      #121828 38%,
+      var(--dusk) 60%,
+      #1f2740 84%,
+      var(--dusk-lift) 100%
+    );
+}
+
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+/* The occlusion canvas (Scene 1's signature move): the same depth mesh,
+   foreground-only, drawn ABOVE the display type — z2 as a LATER sibling of
+   .name-display, so Zak and the kit sit in front of the name while the flag
+   stays behind it. pointer-events stay off: the type underneath remains
+   selectable. */
+.stage-front {
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* No-WebGL branch: the feathered portrait as a plain img, placed by the
+   same layout math (inline style), the type reading fully above it. */
+.drummer-fallback {
+  pointer-events: none;
+}
+
+.drummer-fallback img {
+  position: absolute;
+  user-select: none;
+}
+
+.scene-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Film grain: a tiny tiling noise texture, fixed, static (never animated —
+   settled frames must stay a pure function of journey position for the
+   byte sweep), very subtle. It sits over the world so phone candids, pro
+   shots, and rendered scenes share one filmic surface. */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background-image: url('./assets/grain.png');
+  background-size: 176px 176px;
+  mix-blend-mode: overlay;
+  opacity: 0.55;
+}
+
+/* The honest scrollbar — the page's only verb. */
+.journey {
+  height: var(--journey-length);
+}
+
+/* ---- The fast lane -------------------------------------------------------
+   One quiet line, always present, never punished. Bone identity, tiny mono
+   labels with generous letter-spacing, amber on hover. */
+
+.fastlane {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px 28px;
+  padding: 26px 34px 44px;
+  background: linear-gradient(
+    to bottom,
+    rgba(13, 17, 32, 0.82) 0%,
+    rgba(13, 17, 32, 0.45) 55%,
+    rgba(13, 17, 32, 0) 100%
+  );
+}
+
+.fastlane-identity {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  min-width: 0;
+}
+
+.fastlane-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 640;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bone);
+  white-space: nowrap;
+}
+
+.fastlane-role {
+  margin: 0;
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-size: 14.5px;
+  letter-spacing: 0.015em;
+  color: var(--smoke);
+  white-space: nowrap;
+}
+
+/* Groups the sound toggle with the professional nav on the fastlane's right
+   side (space-between still holds between .fastlane-identity and this
+   wrapper) — ship-pass item 1: "a quiet control in the header area." */
+.fastlane-right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 26px;
+}
+
+.fastlane-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 26px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.fastlane-nav a {
+  color: var(--smoke);
+  text-decoration: none;
+  padding: 2px 1px;
+  transition: color 140ms ease;
+}
+
+.fastlane-nav a:hover {
+  color: var(--amber);
+}
+
+.fastlane-nav a:focus-visible {
+  color: var(--amber);
+  outline: 2px solid var(--amber);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+/* The master sound control — discoverable, never nagging: no first-visit
+   prompt, no badge, just a quiet mono label matching the nav it sits beside.
+   Default OFF (soundStore.ts); "On" reads amber so the ONE non-default
+   state carries the film's own light accent. */
+.sound-toggle {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5em;
+  margin: 0;
+  padding: 2px 1px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--smoke);
+  cursor: pointer;
+  transition: color 140ms ease;
+}
+
+.sound-toggle:hover {
+  color: var(--amber);
+}
+
+.sound-toggle:focus-visible {
+  color: var(--amber);
+  outline: 2px solid var(--amber);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.sound-toggle-state {
+  color: var(--bone);
+}
+
+.sound-toggle[aria-pressed='true'] .sound-toggle-state {
+  color: var(--amber);
+}
+
+@media (max-width: 620px) {
+  .fastlane {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 20px 22px 36px;
+  }
+
+  .fastlane-identity {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .fastlane-right {
+    gap: 6px 18px;
+  }
+
+  .fastlane-nav {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    gap: 6px 18px;
+  }
+
+  .sound-toggle {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+  }
+}
+
+/* ---- The opening frame (THE DRUMMER's DOM half) ---------------------------
+   A film title, not a hero section: ZAK / LYONS set huge at the left in a
+   condensed heavyweight cut of Bricolage, the second line staggered right so
+   its tail passes BEHIND Zak (the occlusion canvas — .stage-front — draws
+   him and the kit above this layer). The amber rule + role line sit beneath,
+   over open dusk. Landscape centers the block against the portrait;
+   portrait viewports stack the name ABOVE him instead (his hairline tucks
+   behind LYONS' lower edge). */
+
+.name-display {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0 clamp(22px, 5.5vw, 92px);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.name-words {
+  margin: 0;
+  font-family: var(--font-display);
+  /* The deliberate display cut: condensed width, heavy but not blobby
+     weight, large optical size — Bricolage's character (the flared K leg,
+     the deep-set Y) reads at distance. */
+  font-weight: 748;
+  font-stretch: 80%;
+  font-variation-settings: 'opsz' 96;
+  font-size: clamp(4.2rem, 15vw, 16.5rem);
+  line-height: 0.86;
+  letter-spacing: -0.008em;
+  text-transform: uppercase;
+  color: var(--bone);
+  /* keeps glyph edges reading over the flag's white stripe */
+  text-shadow: 0 2px 26px rgba(13, 17, 32, 0.38);
+  pointer-events: auto;
+  user-select: text;
+}
+
+.nw-line {
+  display: block;
+}
+
+.nw-line2 {
+  margin-left: 1.5em;
+}
+
+.name-tag {
+  margin: clamp(20px, 3.2vh, 38px) 0 0 8px;
+}
+
+.name-rule {
+  width: clamp(40px, 5vw, 64px);
+  height: 2px;
+  margin: 0;
+  background: linear-gradient(90deg, var(--amber), rgba(245, 164, 92, 0));
+  border: none;
+}
+
+.name-voice {
+  margin: clamp(12px, 1.8vh, 20px) 0 0 0;
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 420;
+  font-size: clamp(1.15rem, 2.1vw, 1.6rem);
+  letter-spacing: 0.005em;
+  color: var(--bone);
+  text-shadow: 0 1px 14px rgba(13, 17, 32, 0.7);
+  pointer-events: auto;
+  user-select: text;
+}
+
+/* Portrait choreography: name stacked above him. */
+@media (max-aspect-ratio: 21/20), (max-width: 719px) {
+  .name-display {
+    justify-content: flex-start;
+    padding-top: clamp(96px, 15vh, 150px);
+  }
+
+  .name-words {
+    font-size: clamp(3.6rem, 22vw, 7.5rem);
+  }
+
+  .nw-line2 {
+    margin-left: 0.92em;
+  }
+
+  .name-tag {
+    position: absolute;
+    left: clamp(22px, 5.5vw, 92px);
+    bottom: clamp(64px, 11vh, 120px);
+    margin: 0;
+  }
+}
+
+/* The only instruction the film ever gives. */
+.scroll-cue {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 26px;
+  z-index: 2;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.42em;
+  text-indent: 0.42em; /* optically recenter the letterspaced word */
+  text-transform: uppercase;
+  color: var(--smoke);
+  pointer-events: none;
+}
+
+/* ---- THE BUILDER (scenes/builder) -----------------------------------------
+   The two panels themselves are WebGL planes (BuilderScene.tsx); this is
+   only their DOM half: the museum-label captions (tracking each panel's
+   live projected position every frame — see builderRig.projectPoint) and
+   the no-WebGL fallback composition. */
+
+.panel-caption {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--smoke);
+  text-shadow: 0 1px 8px rgba(13, 17, 32, 0.85);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* No-WebGL branch: the two crops placed by the same rest-camera projection
+   math as the live panels, feathered via a CSS mask (no hard rectangle
+   edges) with a soft amber glow standing in for the live glow sprite. */
+.builder-fallback {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.builder-fallback-panel {
+  position: absolute;
+  filter: drop-shadow(0 0 42px rgba(245, 164, 92, 0.28));
+}
+
+.builder-fallback-panel img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  mask-image:
+    linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%);
+  mask-composite: intersect;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%);
+  -webkit-mask-composite: source-in;
+}
+
+/* ---- THE DAD (scenes/dad) --------------------------------------------------
+   The two depth meshes + glow sprite are WebGL (DadScene.tsx); this is only
+   the no-WebGL fallback. Unlike every other scene's fallback, its <img>
+   elements are NOT aria-hidden and carry real alt text — see DadScene.tsx's
+   DadFallback doc comment for why these two photographs get that treatment
+   specifically. */
+
+.dad-fallback {
+  pointer-events: none;
+}
+
+.dad-fallback img {
+  position: absolute;
+  user-select: none;
+}
+
+/* ---- Voice lines (film/Subtitle.tsx) --------------------------------------
+   Lower-third, centered like film subtitles. Opacity is written per frame
+   straight from the timeline (no CSS transition — settled frames stay a
+   pure function of journey position). */
+
+.subtitle-layer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: clamp(52px, 9vh, 96px);
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  padding: 0 24px;
+  pointer-events: none;
+}
+
+.subtitle-line {
+  position: relative;
+  margin: 0;
+  max-width: 34em;
+  text-align: center;
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 430;
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  line-height: 1.45;
+  color: var(--bone);
+  /* Film-subtitle shadow stack: a tight contact layer (does the actual
+     legibility work against bright, busy imagery) plus the original wide
+     ambient falloff (unchanged, so dark-ground frames stay pixel-quiet).
+     Dusk-toned throughout — never a hard outline. */
+  text-shadow:
+    0 0 2px rgba(13, 17, 32, 0.95),
+    0 1px 5px rgba(13, 17, 32, 0.9),
+    0 2px 18px rgba(13, 17, 32, 0.65);
+  opacity: 0;
+  will-change: opacity;
+}
+
+/* Local scrim: a wide, feathered dusk gradient sitting behind the text
+   block only. On dark grounds (the common case) it adds virtually nothing
+   — dusk-on-dusk is imperceptible. On bright grounds (e.g. a sunlit
+   wood-chip playground under an italic line) it quietly lowers the local
+   background enough for --bone italic to read clearly. Fades in lockstep
+   with the line itself: this is a ::before of .subtitle-line, so the
+   opacity Subtitle.tsx writes to the paragraph scales the whole group,
+   scrim included — never a moment where the scrim outlives the text.
+   Sized in em so the feather scales with the clamp()'d font size, and
+   spread wide enough (stops finishing well before the inset edge) that it
+   reads as soft light falling off, never a rectangle. */
+.subtitle-line::before {
+  content: '';
+  position: absolute;
+  inset: -0.6em -1.6em;
+  z-index: -1;
+  background: radial-gradient(
+    ellipse closest-side,
+    rgba(13, 17, 32, 0.36) 0%,
+    rgba(13, 17, 32, 0.18) 45%,
+    rgba(13, 17, 32, 0) 78%
+  );
+  pointer-events: none;
+}
+
+/* ---- THE NEIGHBORHOOD (scenes/neighborhood) -------------------------------
+   Beat 1 (the build frame) is WebGL in the shell canvas; these are the DOM
+   layers of beats 2-4: the hero layer carrying the crossing, the work-light
+   bloom that bridges night into day, the dusk veil that closes the segment,
+   and the static (reduced-motion / no-WebGL) before/after edition. All
+   opacities are written per frame straight from the timeline — no CSS
+   transitions (the byte-sweep law). */
+
+.nbhd-hero {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  will-change: opacity;
+  /* The crossing's own container is position:absolute inset 0 — this is
+     its positioned ancestor. */
+}
+
+/* The honest held-photo backstop: the same photograph the crossing renders,
+   cover-fit (CSS cover == the mesh layer's solved cover-fit distance), so
+   "not loaded yet" and "loaded, holding" look like the same held frame. */
+.nbhd-held-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Dusk falls on Royal Tara Cove after the arrival settles: the site's own
+   dusk, not black — the frame the band scene dissolves in from. Lives
+   INSIDE .nbhd-hero (inherits the segment-end dissolve). */
+.nbhd-veil {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      95% 60% at 60% 100%,
+      rgba(245, 164, 92, 0.1) 0%,
+      rgba(245, 164, 92, 0) 60%
+    ),
+    linear-gradient(180deg, #0d1120 0%, #121828 45%, #171e2e 100%);
+}
+
+/* The work-light bloom — the same light-bridges grammar as THE DAD's two
+   blooms, in the DOM because it must lead the hero layer's own crossfade
+   (night frame below, daylight photograph above, the light between them).
+   Center is set per-resize from the build frame's measured work-light UV. */
+.nbhd-bloom {
+  position: fixed;
+  left: 50%;
+  top: 60%;
+  z-index: 2;
+  width: 160vmin;
+  height: 160vmin;
+  margin: -80vmin 0 0 -80vmin;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+  background: radial-gradient(
+    circle,
+    rgba(255, 236, 205, 0.98) 0%,
+    rgba(250, 205, 140, 0.82) 22%,
+    rgba(245, 164, 92, 0.38) 46%,
+    rgba(245, 164, 92, 0) 70%
+  );
+}
+
+/* The static edition (reduced motion / no WebGL): the real photograph and a
+   real render of the settled street, cover-fit, dissolving at the same
+   scroll position the live crossing transforms at. */
+.nbhd-still {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.nbhd-still-build {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(92vw, 132vh);
+  transform: translate(-50%, -52%);
+  opacity: 0;
+  user-select: none;
+}
+
+.nbhd-still-cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  user-select: none;
+}
+
+/* ---- THE BAND (scenes/band) ------------------------------------------------
+   The three flat photo planes are WebGL (BandScene.tsx, reusing THE
+   BUILDER's panel material); `.band-fallback` is only the no-WebGL edition.
+   `.record-affordance` is THE AUDIO DISCOVERY — mounted unconditionally
+   (tracks the record panel's own projected screen position every frame, in
+   both the live-camera and reducedMotion/no-WebGL editions), styled quiet
+   and amber like every other point of light in the film, never a UI
+   control that reads as chrome. */
+
+.band-fallback {
+  pointer-events: none;
+}
+
+.band-fallback img {
+  position: absolute;
+  user-select: none;
+}
+
+.record-affordance {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  /* Placed for real each frame — the JS transform string already includes
+     a trailing translate(-50%, -50%) to center the pill on its own tracked
+     point (percentages in `transform` resolve against the element's OWN
+     box, unlike a percentage margin — see BandScene.tsx's apply()). */
+  transform: translate3d(-9999px, -9999px, 0);
+  margin: 0;
+  padding: 0.5em 0.85em 0.5em 0.7em;
+  border: 1px solid rgba(245, 164, 92, 0.35);
+  border-radius: 999px;
+  background: rgba(13, 17, 32, 0.6);
+  backdrop-filter: blur(3px);
+  color: var(--bone);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 0;
+  will-change: opacity, transform;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.record-affordance:hover,
+.record-affordance:focus-visible {
+  border-color: rgba(245, 164, 92, 0.7);
+  background: rgba(13, 17, 32, 0.78);
+}
+
+.record-affordance:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+}
+
+.record-affordance-icon {
+  color: var(--amber);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.record-affordance-label {
+  text-transform: uppercase;
+}
+
+/* The "tiny playing indicator" — only ever in the DOM while state is
+   'playing' (BandScene.tsx conditionally renders it), so an automated
+   scroll-only sweep never sees it: nothing to exclude, by construction. */
+.record-affordance-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+  animation: record-indicator-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes record-indicator-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .record-affordance-indicator {
+    animation: none;
+    opacity: 0.85;
+  }
+}
+
+/* ---- Easter-egg hotspots (ship-pass item 2) --------------------------------
+   Shared shape for THE DRUMMER's drum-kit click region (DrumHitEgg.tsx) and
+   THE KEEPER's TEXAS-lettering click region (SignGlowEgg.tsx): a real
+   <button>, fully invisible (no glint, no fill, no border — "cursor:pointer
+   only... this one's for finders" per the brief), sized/positioned in JS
+   each frame from the owning scene's own rig math. :focus-visible is the
+   ONE visible trace, so a sighted keyboard user can still see where it is;
+   a mouse/touch visitor only ever gets the cursor hint. */
+
+.egg-hotspot {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 6;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: none;
+  transform: translate3d(-9999px, -9999px, 0);
+}
+
+.egg-hotspot:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 4px;
+}
+
+/* ---- THE WEIRD ONES (scenes/weird) -----------------------------------------
+   The two beat-1 panels + the TV are WebGL (WeirdScene.tsx, its own
+   tvMaterial.ts shader for the bezel/screen/scanlines); `.weird-fallback`
+   is only the no-WebGL edition. `.weird-tv-fallback` gets a plain CSS
+   approximation of the TV's own rounded bezel + a soft inner vignette —
+   real scanlines are the live shader's own job; the fallback trades that
+   flourish for simplicity, the standing "no-WebGL gets less polish, never
+   less content" pattern (real alt text carries the content instead). */
+
+.weird-fallback {
+  pointer-events: none;
+}
+
+.weird-fallback img {
+  position: absolute;
+  user-select: none;
+}
+
+.weird-tv-fallback {
+  border-radius: 10px;
+  box-shadow:
+    0 0 0 10px rgba(10, 12, 20, 0.92),
+    inset 0 0 40px 12px rgba(0, 0, 0, 0.55);
+  object-fit: cover;
+}
+
+/* ---- Pockets (pockets/Pocket.tsx) -----------------------------------------
+   Grammar rule #2: stop + interact. Ported from the proven v1 pocket shell,
+   restyled to the v2 tokens (dusk ground, bone type, amber focus). The
+   glint starts invisible/inert — the owning scene drives it per frame. */
+
+.pocket-glint {
+  position: fixed;
+  z-index: 6;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px; /* left/top (set inline per-pocket) mark the CENTER */
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pocket-glint::before,
+.pocket-glint::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+/* The restrained shimmer: a soft warm core plus a breathing halo — rewards
+   attention, never competes for it. */
+.pocket-glint::before {
+  background: radial-gradient(
+    circle,
+    rgba(255, 244, 224, 0.95) 0%,
+    rgba(245, 164, 92, 0.4) 45%,
+    rgba(245, 164, 92, 0) 75%
+  );
+  animation: pocket-glint-pulse 2.6s ease-in-out infinite;
+}
+
+.pocket-glint::after {
+  box-shadow: 0 0 0 1px rgba(240, 233, 220, 0.3);
+  animation: pocket-glint-ring 2.6s ease-in-out infinite;
+}
+
+.pocket-glint:hover::before,
+.pocket-glint:focus-visible::before {
+  animation-play-state: paused;
+  background: radial-gradient(
+    circle,
+    rgba(255, 248, 233, 1) 0%,
+    rgba(245, 164, 92, 0.55) 50%,
+    rgba(245, 164, 92, 0) 78%
+  );
+}
+
+.pocket-glint:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 6px;
+  border-radius: 50%;
+}
+
+@keyframes pocket-glint-pulse {
+  0%,
+  100% {
+    transform: scale(0.85);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+@keyframes pocket-glint-ring {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+  70%,
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* Ignoring a pocket costs nothing — no motion at all under reduced motion;
+   the glint still shows as a plain, still point of light. */
+@media (prefers-reduced-motion: reduce) {
+  .pocket-glint::before,
+  .pocket-glint::after {
+    animation: none;
+  }
+}
+
+.pocket-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(13, 17, 32, 0.78);
+  backdrop-filter: blur(6px);
+  animation: pocket-fade-in 180ms ease-out;
+}
+
+.pocket-dialog {
+  position: relative;
+  max-width: min(560px, 100%);
+  max-height: min(640px, 88vh);
+  overflow: auto;
+  background: #101524;
+  border: 1px solid rgba(240, 233, 220, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 24px 80px rgba(6, 8, 16, 0.6);
+  padding: 20px;
+}
+
+.pocket-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(240, 233, 220, 0.18);
+  border-radius: 50%;
+  background: rgba(240, 233, 220, 0.06);
+  color: var(--bone);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pocket-close:hover {
+  background: rgba(240, 233, 220, 0.14);
+}
+
+.pocket-close:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.pocket-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pocket-title {
+  margin: 0;
+  padding-right: 34px; /* clears the close button */
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--smoke);
+}
+
+.pocket-media {
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--dusk-deep);
+}
+
+.pocket-media img,
+.pocket-media video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Deliberately NOT styled to resemble a photo — always reads as "nothing
+   shipped yet", never as content. */
+.pocket-media-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+  border: 1px dashed rgba(240, 233, 220, 0.28);
+  border-radius: 8px;
+  color: var(--smoke);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pocket-caption {
+  margin: 0;
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-size: 1.12rem;
+  line-height: 1.5;
+  color: var(--bone);
+}
+
+.pocket-link {
+  align-self: flex-start;
+  color: var(--amber);
+  font-size: 0.95rem;
+  text-underline-offset: 3px;
+}
+
+.pocket-link:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pocket-overlay {
+    animation: none;
+  }
+}
+
+@keyframes pocket-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---- THE KEEPER (scenes/keeper) --------------------------------------------
+   The sign's depth mesh + the three panels are WebGL (KeeperScene.tsx);
+   `.keeper-fallback` is only the no-WebGL edition (real alt text — these
+   objects ARE the scene's content). `.end-card` is the film's SIGNATURE —
+   the last card, real DOM, identical in every edition: one final return of
+   the display type, the amber rule, the contact block, the fast lane
+   restated in one quiet line. Deliberately NOT a footer: no bar, no
+   background, no copyright, no icon row — type sitting in open dusk at the
+   same left measure the opening title used (the bookend). Its opacity is
+   written per frame from the timeline (no CSS transition — the byte law),
+   and the whole card is visibility:hidden until the film arrives at it, so
+   its links never sit in the tab order mid-journey. */
+
+.keeper-fallback {
+  pointer-events: none;
+}
+
+.keeper-fallback img {
+  position: absolute;
+  user-select: none;
+}
+
+/* THE KEEPER'S EASTER EGG (ship-pass item 2b) — SignGlowEgg.tsx's own
+   glow div, positioned/sized identically to its invisible .egg-hotspot
+   sibling each frame. Idle at opacity 0 (nothing to see until clicked); a
+   click adds .sign-glow-firing, which runs the one-shot pulse below. */
+.sign-glow {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 244, 224, 0.95) 0%,
+    rgba(245, 164, 92, 0.55) 42%,
+    rgba(245, 164, 92, 0) 75%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(-9999px, -9999px, 0);
+  will-change: opacity;
+}
+
+.sign-glow.sign-glow-firing {
+  animation: sign-glow-pulse 1.6s ease-out;
+}
+
+@keyframes sign-glow-pulse {
+  0% {
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Ignoring the egg costs nothing; finding it still gets a brief, calm
+   acknowledgment — a quick opacity swap via transition rather than a
+   1.6s animated pulse. */
+@media (prefers-reduced-motion: reduce) {
+  .sign-glow {
+    transition: opacity 220ms ease;
+  }
+  .sign-glow.sign-glow-firing {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+.end-card {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 clamp(22px, 5.5vw, 92px);
+  pointer-events: auto;
+  opacity: 0;
+  visibility: hidden;
+  will-change: opacity;
+}
+
+/* The card itself is focusable/clickable now too (the postscript egg —
+   endCardEasterEgg.ts) — a visible ring only for keyboard focus, never a
+   mouse-click affordance (no hover style at all: finding this is the same
+   "no glint" restraint the other eggs use). */
+.end-card:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: -6px;
+}
+
+.end-card-inner {
+  max-width: 620px;
+}
+
+.end-display {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-stretch: 86%;
+  font-variation-settings: 'opsz' 48;
+  font-size: clamp(1.7rem, 3.2vw, 2.7rem);
+  line-height: 1.08;
+  letter-spacing: 0.002em;
+  color: var(--bone);
+  pointer-events: auto;
+  user-select: text;
+}
+
+.end-voice {
+  margin: clamp(10px, 1.6vh, 16px) 0 0 0;
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 420;
+  font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+  color: var(--smoke);
+  pointer-events: auto;
+  user-select: text;
+}
+
+/* THE END CARD'S POSTSCRIPT EASTER EGG (ship-pass item 2c) — only ever in
+   the DOM after 3 clicks on the card (endCardEasterEgg.ts), so it plays no
+   part in the byte sweep (a scroll-only automated pass never clicks
+   anything — nothing to exclude, by construction, the record-affordance-
+   indicator precedent). The animation runs once on mount, since the
+   element's very existence IS the reveal. */
+.end-postscript {
+  margin: clamp(8px, 1.2vh, 12px) 0 0 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--smoke);
+  pointer-events: none;
+  animation: end-postscript-in 900ms ease-out both;
+}
+
+@keyframes end-postscript-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .end-postscript {
+    animation: none;
+  }
+}
+
+.end-rule {
+  width: clamp(40px, 5vw, 64px);
+  height: 2px;
+  margin: clamp(22px, 3.4vh, 40px) 0 0 0;
+  background: linear-gradient(90deg, var(--amber), rgba(245, 164, 92, 0));
+  border: none;
+}
+
+.end-contact {
+  margin: clamp(20px, 3vh, 34px) 0 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+}
+
+.end-contact a {
+  color: var(--bone);
+  text-decoration: none;
+  pointer-events: auto;
+  transition: color 140ms ease;
+}
+
+.end-contact a:hover {
+  color: var(--amber);
+}
+
+.end-contact a:focus-visible {
+  color: var(--amber);
+  outline: 2px solid var(--amber);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.end-lane {
+  margin: clamp(28px, 4.5vh, 52px) 0 0 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--smoke);
+}
+
+.end-lane a {
+  color: var(--smoke);
+  text-decoration: none;
+  pointer-events: auto;
+  transition: color 140ms ease;
+}
+
+.end-lane a:hover {
+  color: var(--amber);
+}
+
+.end-lane a:focus-visible {
+  color: var(--amber);
+  outline: 2px solid var(--amber);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+@media (max-aspect-ratio: 21/20), (max-width: 719px) {
+  .end-card {
+    justify-content: flex-end;
+    padding-bottom: clamp(72px, 13vh, 140px);
+  }
+}
+
+/* ---- Debug (?debug=1 only) ----------------------------------------------- */
+
+.debug-readout {
+  position: fixed;
+  left: 14px;
+  bottom: 12px;
+  z-index: 20;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--smoke);
+  background: rgba(13, 17, 32, 0.72);
+  padding: 8px 12px;
+  border-radius: 4px;
+  pointer-events: none;
+  white-space: pre;
+}
+
+/* ---- Reduced motion base rules --------------------------------------------
+   The authored low-motion edition arrives with the scenes; until then the
+   base law: nothing autonomous moves. (The journey itself is already
+   scroll-driven — motion only ever follows the visitor's own input.) */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---- Film pills + embeds (continuity re-cut, 2026-09-01) --------------------
+   `.film-pill` is the generic labeled point-of-light control the re-cut
+   adds (the RTC play link; TEASPANKS's WATCH pill) — the same quiet amber
+   pill language as `.record-affordance`, as an <a> or <button>, with an
+   optional second line. `.pocket-embed` is a pocket's iframe media (YouTube
+   16:9, or Spotify's fixed-height album player). */
+.film-pill {
+  position: fixed;
+  z-index: 6;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15em;
+  margin: 0;
+  padding: 0.55em 0.95em 0.6em 0.8em;
+  border: 1px solid rgba(245, 164, 92, 0.42);
+  border-radius: 14px;
+  background: rgba(13, 17, 32, 0.66);
+  backdrop-filter: blur(4px);
+  color: var(--bone);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+  box-shadow: 0 0 0 0 rgba(245, 164, 92, 0);
+}
+
+.film-pill:hover,
+.film-pill:focus-visible {
+  border-color: rgba(245, 164, 92, 0.85);
+  background: rgba(13, 17, 32, 0.82);
+  box-shadow: 0 0 28px rgba(245, 164, 92, 0.18);
+}
+
+.film-pill:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+}
+
+.film-pill-icon {
+  color: var(--amber);
+  font-size: 12px;
+  line-height: 1;
+  margin-right: 0.5em;
+}
+
+.film-pill-label {
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.film-pill-icon + .film-pill-label {
+  display: inline;
+}
+
+.film-pill-sub {
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: var(--smoke);
+  text-transform: none;
+}
+
+/* A pill's first row: icon + label inline; an optional sub line beneath.
+   Column flex: the pill is as wide as its widest row, so the sub line can
+   never overflow the box (the portrait mailbox pill did, as a grid). */
+.film-pill-row {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* left/top mark the mailbox point; the pill hangs centered beneath it. */
+.rtc-play {
+  transform: translate(-50%, 0);
+}
+
+.record-affordance--jukebox .record-affordance-icon {
+  font-size: 13px;
+}
+
+.pocket-embed {
+  position: relative;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--dusk-deep);
+}
+
+.pocket-embed--video {
+  aspect-ratio: 16 / 9;
+}
+
+.pocket-embed--spotify {
+  height: 352px;
+}
+
+.pocket-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+@media (max-width: 620px) {
+  .film-pill {
+    font-size: 10.5px;
+    padding: 0.5em 0.85em 0.55em 0.75em;
+  }
+}
+
+/* TEASPANKS's WATCH pill: left/top mark the projected point; centered on it. */
+.teaspanks-watch {
+  transform: translate(-50%, -50%);
+  align-items: center;
+}
+
+/* Museum labels with a short form for narrow frames (TEASPANKS). */
+.caption-short {
+  display: none;
+}
+
+@media (max-aspect-ratio: 21/20), (max-width: 719px) {
+  .caption-long {
+    display: none;
+  }
+  .caption-short {
+    display: inline;
+  }
+}

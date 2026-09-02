@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Zak Lyons — projects. Kaelbot and Royal Tara Cove, described factually."
+    />
+    <meta name="theme-color" content="#171e2e" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="canonical" href="https://lyonszak.com/projects" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://lyonszak.com/projects" />
+    <meta property="og:site_name" content="Zak Lyons" />
+    <meta property="og:title" content="Projects — Zak Lyons" />
+    <meta
+      property="og:description"
+      content="Zak Lyons — projects. Kaelbot and Royal Tara Cove, described factually."
+    />
+    <meta property="og:image" content="https://lyonszak.com/og-image.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Projects — Zak Lyons" />
+    <meta
+      name="twitter:description"
+      content="Zak Lyons — projects. Kaelbot and Royal Tara Cove, described factually."
+    />
+    <meta name="twitter:image" content="https://lyonszak.com/og-image.jpg" />
+    <link rel="stylesheet" href="/src/fastlane/pages.css" />
+    <title>Projects — Zak Lyons</title>
+  </head>
+  <body>
+    <a class="fl-skip-link" href="#fl-main">Skip to projects content</a>
+    <header class="fl-header">
+      <div class="fl-header-inner">
+        <a class="fl-back" href="/">&larr; back to the journey</a>
+        <div class="fl-identity">
+          <h1 class="fl-name">Zak Lyons</h1>
+          <p class="fl-role">Senior Software Engineer</p>
+        </div>
+        <nav class="fl-nav" aria-label="Professional">
+          <a href="/resume">Resume</a>
+          <a href="/experience">Experience</a>
+          <a href="/projects" aria-current="page">Projects</a>
+          <a href="/contact">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <h2 class="fl-page-heading">Projects</h2>
+    <p class="fl-page-lede">
+      Two things built end-to-end, described factually. A project's value here never depends on
+      whether it happens to be running right now.
+    </p>
+
+    <main class="fl-main" id="fl-main">
+      <article class="fl-project" aria-labelledby="h-kaelbot">
+        <h3 class="fl-project-title" id="h-kaelbot">Kaelbot</h3>
+        <p class="fl-project-meta">Django/Python · React/TypeScript · PostgreSQL + pgvector · Celery · Redis · Docker</p>
+        <p>
+          Kaelbot is an autonomous AI job-search agent that Zak designed and built solo: a
+          Django/Python backend and a React/TypeScript frontend, with PostgreSQL and pgvector for
+          semantic memory, Celery and Redis for background processing, and Docker for deployment.
+        </p>
+        <p>
+          The agent orchestrates its own tool calls against more than twenty-five structured tools
+          — lead creation, resume tailoring, cover-letter generation, dossier synthesis, artifact
+          storage, preference clustering — and maintains per-user persistent memory that supersedes
+          corrected facts over time. It runs autonomous web-research investigations, generating its
+          own search queries and synthesizing the results into ranked leads with fit scores, and it
+          generates tailored resumes and cover letters that re-emphasize a user's existing material
+          without inventing experience, with factual integrity enforced at the prompt layer.
+        </p>
+        <p>
+          Kaelbot is not currently deployed publicly. This entry describes work that was designed,
+          built, and operated — not a live product.
+        </p>
+      </article>
+
+      <article class="fl-project" aria-labelledby="h-rtc">
+        <h3 class="fl-project-title" id="h-rtc">Royal Tara Cove</h3>
+        <p class="fl-project-meta">React Three Fiber (Three.js) · WebRTC peer-to-peer multiplayer</p>
+        <p>
+          Royal Tara Cove is a browser-based 3D neighborhood game Zak built for his kids, Penny and
+          Luke: a recreation of the cul-de-sac in Avery Ranch, Austin, TX, where the family used to
+          live. It runs in React Three Fiber with real-time peer-to-peer multiplayer over WebRTC,
+          so Zak and his kids can be in the old neighborhood together from separate browsers,
+          choosing a character &mdash; Dad, Penny, or Luke &mdash; and moving through a street modeled
+          house-by-house from the family's memory of the real place.
+        </p>
+        <p>
+          The game has grown over dozens of iterations, with modes and details added as the kids
+          come up with ideas for what the neighborhood should have next.
+        </p>
+        <p>
+          <a class="fl-project-link" href="https://royal-tara-cove.netlify.app/" target="_blank" rel="noopener">
+            Play the live game &rarr; royal-tara-cove.netlify.app
+          </a>
+        </p>
+      </article>
+    </main>
+  </body>
+</html>

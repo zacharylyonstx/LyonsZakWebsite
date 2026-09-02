@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Amber rule on dusk">
+  <rect width="32" height="32" fill="#171e2e"/>
+  <defs>
+    <radialGradient id="g" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f5a45c" stop-opacity="0.95"/>
+      <stop offset="55%" stop-color="#f5a45c" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#f5a45c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="r" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f5a45c" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#f5a45c" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <circle cx="9" cy="16.5" r="9" fill="url(#g)"/>
+  <rect x="7" y="15.3" width="21" height="2.4" rx="1.2" fill="url(#r)"/>
+</svg>
