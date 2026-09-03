@@ -262,6 +262,14 @@ describe('segmentProgress', () => {
     const html = readFileSync(new URL('../../index.html', import.meta.url), 'utf8');
     expect(css).toContain(`--journey-length: ${JOURNEY_PX}px;`);
     expect(html).toContain(`--journey-length: ${JOURNEY_PX}px;`);
+    // The mobile scroll pass (2026-09-03): App.tsx divides scroll by the
+    // FIXED JOURNEY_PX, so the page must always be able to scroll at least
+    // that far whatever a phone's toolbar does — .journey carries one large
+    // viewport of slack, and the film's canvases are sized to the large
+    // viewport too (they must never re-size mid-scroll).
+    expect(css).toContain('height: calc(var(--journey-length) + 100lvh);');
+    expect(css).toMatch(/\.stage \{[^}]*height: 100lvh;/);
+    expect(css).toMatch(/\.nbhd-hero \{[^}]*height: 100lvh;/);
     // Segments tile the journey exactly — no gaps, no overlaps.
     const names = Object.keys(SEGMENTS) as Array<keyof typeof SEGMENTS>;
     expect(SEGMENTS[names[0]][0]).toBe(0);
@@ -269,5 +277,27 @@ describe('segmentProgress', () => {
     for (let i = 1; i < names.length; i++) {
       expect(SEGMENTS[names[i - 1]][1]).toBe(SEGMENTS[names[i]][0]);
     }
+  });
+});
+
+
+describe('a fixed-length scroll source (App.tsx, the mobile pass)', () => {
+  it('maps scrollY to t against a constant length, unmoved by viewport changes', () => {
+    let y = 0;
+    const tl = createScrollTimeline({
+      scrollSource: { scrollY: () => y, maxScroll: () => JOURNEY_PX },
+      autoStart: false,
+    });
+    y = JOURNEY_PX / 2;
+    tl.stepForTest(16);
+    expect(tl.target()).toBeCloseTo(0.5, 12);
+    // A toolbar collapsing used to change (scrollHeight − innerHeight) and
+    // move the target; with a constant length there is nothing to move.
+    tl.stepForTest(16);
+    expect(tl.target()).toBeCloseTo(0.5, 12);
+    y = JOURNEY_PX + 90; // the slack viewport past the film's end
+    tl.stepForTest(16);
+    expect(tl.target()).toBe(1);
+    tl.dispose();
   });
 });

@@ -15,6 +15,7 @@ import {
   signTextAnchorWorld,
   signTextHotspotSize,
 } from './keeperRig';
+import { filmHeight } from '../../timeline/filmViewport';
 
 /** How long the CSS pulse (and its reduced-motion opacity swap) stays
  *  visible before the class is removed — matches the keyframe's own
@@ -48,7 +49,7 @@ export function SignGlowEgg({
         return;
       }
       const w = window.innerWidth;
-      const h = window.innerHeight;
+      const h = filmHeight();
       const cam = cameraPose(value, reducedMotion);
       const anchor = signTextAnchorWorld(w, h);
       const screen = projectPoint(anchor, cam, w, h);

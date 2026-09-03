@@ -58,6 +58,7 @@ import {
 import { AlienPrankPocket } from '../../pockets/AlienPrankPocket';
 import type { PocketHandle } from '../../pockets/Pocket';
 import type { ScrollTimeline } from '../../timeline/scrollTimeline';
+import { filmHeight } from '../../timeline/filmViewport';
 
 export { WEIRD_END };
 
@@ -362,7 +363,7 @@ export function WeirdLabel({
         return;
       }
       const w = window.innerWidth;
-      const h = window.innerHeight;
+      const h = filmHeight();
       const cam = cameraPose(value, reducedMotion);
       const anchor = mf1CaptionAnchor(w, h);
       const screen = projectPoint(anchor, cam, w, h);
@@ -399,7 +400,7 @@ export function WeirdDiscovery({
     const cam = reducedMotion ? { x: 0, y: 0, z: REST_Z } : WEIRD_END;
     return weirdGlintAt(
       typeof window === 'undefined' ? 1600 : window.innerWidth,
-      typeof window === 'undefined' ? 1000 : window.innerHeight,
+      typeof window === 'undefined' ? 1000 : filmHeight(),
       cam,
     );
   });
@@ -407,7 +408,7 @@ export function WeirdDiscovery({
   useEffect(() => {
     const compute = () => {
       const cam = reducedMotion ? { x: 0, y: 0, z: REST_Z } : WEIRD_END;
-      setGlintAt(weirdGlintAt(window.innerWidth, window.innerHeight, cam));
+      setGlintAt(weirdGlintAt(window.innerWidth, filmHeight(), cam));
     };
     compute();
     window.addEventListener('resize', compute);
@@ -440,7 +441,7 @@ export function WeirdFallback({ timeline }: { timeline: ScrollTimeline | null })
   useEffect(() => {
     const place = () => {
       const w = window.innerWidth;
-      const h = window.innerHeight;
+      const h = filmHeight();
       const mf1Lay = weirdPanelLayout('mf1', w, h);
       const wppMf1 = (2 * (REST_Z - mf1Lay.z) * Math.tan((FOV_DEG * Math.PI) / 360)) / h;
       if (mf1Ref.current) {

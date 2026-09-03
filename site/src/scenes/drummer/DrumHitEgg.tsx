@@ -18,6 +18,7 @@ import {
   projectPoint,
 } from './drummerRig';
 import { getSoundStore } from '../../audio/soundStore';
+import { filmHeight } from '../../timeline/filmViewport';
 
 // public/audio/ (not public/assets/, which stays gitignored per site/
 // .gitignore's own "decoded production assets" rule) — this file is small,
@@ -47,7 +48,7 @@ export function DrumHitEgg({
         return;
       }
       const w = window.innerWidth;
-      const h = window.innerHeight;
+      const h = filmHeight();
       const cam = cameraPose(value, reducedMotion);
       const anchor = drumKitAnchorWorld(w, h);
       const screen = projectPoint(anchor, cam, w, h);

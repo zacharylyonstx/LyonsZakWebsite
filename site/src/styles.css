@@ -148,7 +148,16 @@ body {
 
 .stage {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* The LARGE viewport (the frame with a phone's toolbar collapsed), not
+     `inset: 0`: a fixed layer that tracks the toolbar re-sizes its WebGL
+     drawing buffer every time the toolbar moves — mid-scroll, on a phone,
+     that is a dropped-frames hitch by design. Sized once, held; the
+     projection math reads the same height (src/timeline/filmViewport.ts). */
+  height: 100vh;
+  height: 100lvh;
   z-index: 1;
 }
 
@@ -197,7 +206,14 @@ body {
 
 /* The honest scrollbar — the page's only verb. */
 .journey {
-  height: var(--journey-length);
+  /* The film's length PLUS one large viewport: the page can always scroll
+     exactly --journey-length px whatever the toolbar is doing (a phone's
+     collapsing toolbar shrinks innerHeight, which used to shrink the
+     scrollable range and MOVE the film — App.tsx now divides scroll by the
+     fixed JOURNEY_PX instead; this keeps that many pixels reachable). On
+     desktop the two are identical. */
+  height: calc(var(--journey-length) + 100vh);
+  height: calc(var(--journey-length) + 100lvh);
 }
 
 /* ---- The fast lane -------------------------------------------------------
@@ -620,7 +636,11 @@ body {
 
 .nbhd-hero {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100lvh; /* the film frame — see .stage */
   z-index: 2;
   opacity: 0;
   visibility: hidden;
@@ -1501,4 +1521,383 @@ body {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--smoke);
+}
+
+/* ---- THE CONTACT CARD (src/contact, 2026-09-03) ----------------------------
+   The professional headshot's home in the film. Two doors: the fast lane's
+   identity block (a button now — the amber glint after the name is the
+   site's own "look closer" mark) and the end card's medallion. The card
+   itself rides the pocket overlay tier: a dusk sheet, the suit portrait as
+   a real photographic panel (not an avatar circle), the facts set the way
+   the fast-lane pages set them, three plain actions. */
+
+.fastlane-identity-btn {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.fastlane-identity-btn:hover .fastlane-name,
+.fastlane-identity-btn:focus-visible .fastlane-name {
+  color: var(--amber);
+}
+
+.fastlane-identity-btn:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 6px;
+  border-radius: 2px;
+}
+
+.fastlane-name {
+  transition: color 140ms ease;
+}
+
+.fastlane-glint {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin: 0 0 0.16em 0.55em;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 10px 1px rgba(245, 164, 92, 0.55);
+  vertical-align: middle;
+}
+
+@media (hover: hover) {
+  .fastlane-identity-btn:hover .fastlane-glint {
+    box-shadow: 0 0 14px 3px rgba(245, 164, 92, 0.7);
+  }
+}
+
+.contact-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 212px) minmax(0, 1fr);
+  gap: 0;
+  width: min(724px, 100%);
+  max-height: min(720px, 92vh);
+  max-height: min(720px, 92dvh);
+  overflow: auto;
+  background: #101524;
+  border: 1px solid rgba(240, 233, 220, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 24px 80px rgba(6, 8, 16, 0.6);
+  outline: none;
+}
+
+.contact-card:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+}
+
+.contact-card-photo {
+  position: relative;
+  min-height: 100%;
+  background: var(--dusk-deep);
+}
+
+.contact-card-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  border-radius: 14px 0 0 14px;
+}
+
+/* The atrium's daylight meets the film's dusk at the seam. */
+.contact-card-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px 0 0 14px;
+  background: linear-gradient(90deg, rgba(16, 21, 36, 0) 78%, rgba(16, 21, 36, 0.55) 100%);
+  pointer-events: none;
+}
+
+.contact-card-body {
+  padding: 26px 28px 24px 26px;
+  min-width: 0;
+}
+
+.contact-card-eyebrow {
+  margin: 0 0 12px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--smoke);
+}
+
+.contact-card-name {
+  margin: 0;
+  padding-right: 30px; /* clears the close button */
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-stretch: 84%;
+  font-variation-settings: 'opsz' 48;
+  font-size: clamp(1.9rem, 4.2vw, 2.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+
+.contact-card-role {
+  margin: 8px 0 0;
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--smoke);
+}
+
+.contact-card-line {
+  margin: 14px 0 0;
+  font-family: var(--font-voice);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: var(--bone);
+  max-width: 36em;
+}
+
+.contact-card-rows {
+  margin: 18px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px solid rgba(240, 233, 220, 0.12);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+}
+
+/* The close button rides over the bright atrium photo — give it a dusk disc. */
+.contact-card .pocket-close {
+  background: rgba(13, 17, 32, 0.6);
+  border-color: rgba(240, 233, 220, 0.3);
+  backdrop-filter: blur(4px);
+}
+
+.contact-card .pocket-close:hover {
+  background: rgba(13, 17, 32, 0.85);
+}
+
+.contact-card-rows dt {
+  margin: 0 0 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--smoke);
+}
+
+.contact-card-rows dd {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  letter-spacing: -0.005em;
+  overflow-wrap: anywhere;
+}
+
+.contact-card-rows a {
+  color: var(--bone);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(240, 233, 220, 0.18);
+  transition: color 140ms ease, border-color 140ms ease;
+}
+
+.contact-card-rows a:hover,
+.contact-card-rows a:focus-visible {
+  color: var(--amber);
+  border-bottom-color: var(--amber);
+}
+
+.contact-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0 0;
+}
+
+.contact-action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid rgba(240, 233, 220, 0.2);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bone);
+  text-decoration: none;
+  transition: color 140ms ease, border-color 140ms ease, background 140ms ease;
+}
+
+.contact-action:hover,
+.contact-action:focus-visible {
+  color: var(--amber);
+  border-color: var(--amber);
+}
+
+.contact-action-primary {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: var(--dusk-deep);
+  font-weight: 600;
+}
+
+.contact-action-primary:hover,
+.contact-action-primary:focus-visible {
+  background: #ffb877;
+  border-color: #ffb877;
+  color: var(--dusk-deep);
+}
+
+.contact-card-foot {
+  margin: 18px 0 0;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.contact-card-foot a {
+  color: var(--smoke);
+  text-decoration: none;
+}
+
+.contact-card-foot a:hover,
+.contact-card-foot a:focus-visible {
+  color: var(--amber);
+}
+
+/* Narrow frames: the portrait becomes a header band above the facts. */
+@media (max-width: 560px) {
+  .contact-overlay {
+    padding: 14px;
+    align-items: flex-end;
+  }
+
+  .contact-card {
+    grid-template-columns: minmax(0, 1fr);
+    max-height: min(760px, 92dvh);
+  }
+
+  .contact-card-photo {
+    aspect-ratio: 2 / 1;
+    min-height: 0;
+  }
+
+  .contact-card-line {
+    display: none; /* the facts are the card on a phone */
+  }
+
+  .contact-card-photo img {
+    border-radius: 14px 14px 0 0;
+    object-position: 50% 22%;
+  }
+
+  .contact-card-photo::after {
+    border-radius: 14px 14px 0 0;
+    background: linear-gradient(180deg, rgba(16, 21, 36, 0) 70%, rgba(16, 21, 36, 0.7) 100%);
+  }
+
+  .contact-card-body {
+    padding: 18px 20px 20px;
+  }
+
+  .contact-card-rows {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+  }
+
+  .contact-card-actions {
+    margin-top: 16px;
+  }
+}
+
+@media (max-width: 560px) {
+  .end-identity-row {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .end-medallion {
+    width: 64px;
+    height: 64px;
+  }
+}
+
+/* The end card's medallion — the suit next to the number. */
+.end-identity-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  margin: clamp(16px, 2.6vh, 28px) 0 0;
+}
+
+.end-medallion {
+  flex: 0 0 auto;
+  width: 76px;
+  height: 76px;
+  padding: 0;
+  margin: 2px 0 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--dusk-deep);
+  box-shadow:
+    0 0 0 1.5px rgba(245, 164, 92, 0.85),
+    0 0 22px rgba(245, 164, 92, 0.22);
+  cursor: pointer;
+  pointer-events: auto;
+  overflow: hidden;
+  transition: box-shadow 160ms ease, transform 160ms ease;
+}
+
+.end-medallion img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.end-medallion:hover,
+.end-medallion:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--amber),
+    0 0 30px rgba(245, 164, 92, 0.4);
+  transform: scale(1.03);
+  outline: none;
+}
+
+.end-identity-text {
+  min-width: 0;
+}
+
+.end-identity-row .end-identity {
+  margin-top: 6px;
+}
+
+.end-identity-row .end-contact {
+  margin-top: 14px;
+}
+
+.end-save {
+  color: var(--amber) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .end-medallion,
+  .end-medallion:hover {
+    transition: none;
+    transform: none;
+  }
 }

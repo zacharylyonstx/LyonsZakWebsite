@@ -72,6 +72,7 @@ import {
   gigGlintAnchor,
   gigGlintOpacity,
 } from './bandRig';
+import { filmHeight } from '../../timeline/filmViewport';
 
 export { BAND_END };
 
@@ -371,7 +372,7 @@ export function RecordAffordance({
         return;
       }
       const w = window.innerWidth;
-      const h = window.innerHeight;
+      const h = filmHeight();
       const cam = cameraPose(value, reducedMotion);
       const anchor = recordAffordanceAnchor(w, h);
       const screen = projectPoint(anchor, cam, w, h);
@@ -526,7 +527,7 @@ export function GigVideoDiscovery({
         return;
       }
       const w = window.innerWidth;
-      const h = window.innerHeight;
+      const h = filmHeight();
       const cam = cameraPose(value, reducedMotion);
       const screen = projectPoint(gigGlintAnchor(w, h), cam, w, h);
       handle.setGlintPosition(screen.x / w, screen.y / h);
@@ -583,7 +584,7 @@ export function BandFallback({ timeline }: { timeline: ScrollTimeline | null }) 
   useEffect(() => {
     const place = () => {
       const w = window.innerWidth;
-      const h = window.innerHeight;
+      const h = filmHeight();
       const gLay = gigLayout(w, h);
       if (gigRef.current) {
         gigRef.current.style.left = `${gLay.rect.left.toFixed(1)}px`;

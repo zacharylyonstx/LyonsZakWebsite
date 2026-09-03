@@ -38,6 +38,7 @@ import { Pocket, type PocketHandle } from '../../pockets/Pocket';
 import { PocketCard, PocketEmbed } from '../../pockets/PocketCard';
 import { TEASPANKS_CONTENT } from '../../pockets/teaspanks';
 import type { ScrollTimeline } from '../../timeline/scrollTimeline';
+import { filmHeight } from '../../timeline/filmViewport';
 
 export { TEASPANKS_END };
 
@@ -166,7 +167,7 @@ export function TeaspanksLabel({
         return;
       }
       const w = window.innerWidth;
-      const h = window.innerHeight;
+      const h = filmHeight();
       const cam = cameraPose(value, reducedMotion);
       const screen = projectPoint(labelAnchor(w, h), cam, w, h);
       el.style.transform = `translate3d(${screen.x.toFixed(1)}px, ${screen.y.toFixed(1)}px, 0)`;
@@ -209,7 +210,7 @@ export function TeaspanksDiscovery({
       el.setAttribute('aria-hidden', inert ? 'true' : 'false');
       if (opacity <= 0.0005) return;
       const w = window.innerWidth;
-      const h = window.innerHeight;
+      const h = filmHeight();
       const cam = cameraPose(value, reducedMotion);
       const screen = projectPoint(pillAnchor(w, h), cam, w, h);
       el.style.left = `${screen.x.toFixed(1)}px`;
@@ -273,13 +274,13 @@ export function TeaspanksFallback({ timeline }: { timeline: ScrollTimeline | nul
     const place = () => {
       const el = ref.current;
       if (!el) return;
-      const lay = panelLayout(window.innerWidth, window.innerHeight);
-      const wpp = (2 * REST_Z * Math.tan((FOV_DEG * Math.PI) / 360)) / window.innerHeight;
+      const lay = panelLayout(window.innerWidth, filmHeight());
+      const wpp = (2 * REST_Z * Math.tan((FOV_DEG * Math.PI) / 360)) / filmHeight();
       const scale = lay.worldPerPx / wpp; // rest-camera projection of the REF_Z layout
       const width = lay.rect.width * scale;
       const height = lay.rect.height * scale;
       const cx = window.innerWidth / 2 + lay.meshX / wpp;
-      const cy = window.innerHeight / 2 - lay.meshY / wpp;
+      const cy = filmHeight() / 2 - lay.meshY / wpp;
       el.style.left = `${(cx - width / 2).toFixed(1)}px`;
       el.style.top = `${(cy - height / 2).toFixed(1)}px`;
       el.style.width = `${width.toFixed(1)}px`;

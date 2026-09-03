@@ -618,3 +618,136 @@ button:focus-visible {
     break-after: avoid-page;
   }
 }
+
+/* ---- The headshot (2026-09-03) ---------------------------------------------
+   The professional portrait: a small avatar beside the name on every fast-lane
+   page (a door to /contact), and the contact card proper on /contact. */
+
+.fl-identity {
+  align-items: center;
+}
+
+.fl-avatar {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 0 1.5px var(--accent);
+  transition: box-shadow 140ms ease;
+}
+
+.fl-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fl-avatar:hover,
+.fl-avatar:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent), 0 0 18px rgba(245, 164, 92, 0.35);
+}
+
+.cc {
+  margin-top: 26px;
+  display: grid;
+  grid-template-columns: minmax(0, 250px) minmax(0, 1fr);
+  gap: 32px 40px;
+  align-items: start;
+}
+
+.cc-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 18px 50px rgba(6, 8, 16, 0.45);
+}
+
+.cc-eyebrow {
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.cc-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-stretch: 84%;
+  font-size: clamp(2.1rem, 5vw, 2.9rem);
+  line-height: 0.98;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+}
+
+.cc-role {
+  margin: 8px 0 18px;
+  font-style: italic;
+  color: var(--ink-muted);
+}
+
+.cc-body .fl-summary {
+  margin-bottom: 26px;
+}
+
+.cc-actions {
+  margin-top: 26px;
+}
+
+.fl-download.cc-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-deep);
+}
+
+.fl-download.cc-primary:hover {
+  filter: brightness(1.08);
+  color: var(--bg-deep);
+}
+
+@media (prefers-color-scheme: light) {
+  .cc-photo img {
+    box-shadow: 0 14px 40px rgba(29, 36, 51, 0.18);
+  }
+
+  .fl-download.cc-primary {
+    color: #fff;
+  }
+
+  .fl-download.cc-primary:hover {
+    color: #fff;
+  }
+}
+
+@media (max-width: 700px) {
+  .cc {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  .cc-photo {
+    max-width: 220px;
+  }
+}
+
+@media print {
+  .fl-avatar {
+    display: none;
+  }
+
+  .cc {
+    grid-template-columns: 1.4in minmax(0, 1fr);
+    gap: 0.25in;
+  }
+
+  .cc-photo img {
+    box-shadow: none;
+    border-radius: 4px;
+  }
+}

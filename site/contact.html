@@ -14,14 +14,16 @@
     <meta property="og:url" content="https://lyonszak.com/contact" />
     <meta property="og:site_name" content="Zak Lyons" />
     <meta property="og:title" content="Contact — Zak Lyons" />
-    <meta property="og:description" content="Contact Zak Lyons." />
-    <meta property="og:image" content="https://lyonszak.com/og-image.jpg?v=20260902" />
-    <meta property="og:image:alt" content="Zak Lyons behind a wine-red drum kit in front of a Texas flag, mid-grin, his name set in huge type behind him — the opening frame of lyonszak.com, an interactive self-portrait." />
+    <meta property="og:description" content="Zak Lyons — senior software engineer, Georgetown, Texas. Call, text, email, or save the contact card." />
+    <meta property="og:image" content="https://lyonszak.com/og-contact.jpg?v=20260903" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Zak Lyons in a gray suit and plum tie, smiling — his contact card: senior software engineer, Georgetown, Texas, (512) 497-2838, zacharylyonstx@gmail.com." />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Contact — Zak Lyons" />
-    <meta name="twitter:description" content="Contact Zak Lyons." />
-    <meta name="twitter:image" content="https://lyonszak.com/og-image.jpg?v=20260902" />
-    <meta name="twitter:image:alt" content="Zak Lyons behind a wine-red drum kit in front of a Texas flag, mid-grin, his name set in huge type behind him — the opening frame of lyonszak.com, an interactive self-portrait." />
+    <meta name="twitter:description" content="Zak Lyons — senior software engineer, Georgetown, Texas. Call, text, email, or save the contact card." />
+    <meta name="twitter:image" content="https://lyonszak.com/og-contact.jpg?v=20260903" />
+    <meta name="twitter:image:alt" content="Zak Lyons in a gray suit and plum tie, smiling — his contact card: senior software engineer, Georgetown, Texas, (512) 497-2838, zacharylyonstx@gmail.com." />
     <link rel="stylesheet" href="/src/fastlane/pages.css" />
     <!-- seo:jsonld — Person + WebSite (+ this page). Single source: scripts/seo.mjs regenerates every page. -->
     <script type="application/ld+json">
@@ -43,7 +45,11 @@
       "additionalName": "Alan",
       "familyName": "Lyons",
       "url": "https://lyonszak.com/",
-      "image": "https://lyonszak.com/og-image.jpg",
+      "image": [
+        "https://lyonszak.com/zak-headshot-sq.jpg",
+        "https://lyonszak.com/zak-headshot.jpg",
+        "https://lyonszak.com/og-image.jpg"
+      ],
       "jobTitle": "Senior Software Engineer",
       "description": "Zak Lyons (Zachary Alan Lyons) is a senior full-stack software engineer in Georgetown, Texas — Django/Python and React/TypeScript, seven-plus years shipping products end to end in healthcare, startups, and legacy modernization — and a dad, drummer, and maker.",
       "telephone": "+1-512-497-2838",
@@ -135,6 +141,9 @@
       <div class="fl-header-inner">
         <a class="fl-back" href="/">&larr; back to the journey</a>
         <div class="fl-identity">
+          <a class="fl-avatar" href="/contact" aria-label="Contact card">
+            <img src="/zak-headshot-avatar.webp" width="36" height="36" alt="" decoding="async" />
+          </a>
           <h1 class="fl-name">Zak Lyons</h1>
           <p class="fl-role">Senior Software Engineer</p>
         </div>
@@ -150,37 +159,63 @@
     <h2 class="fl-page-heading">Contact</h2>
 
     <main class="fl-main" id="fl-main">
-      <p class="fl-summary">Zachary Alan Lyons &mdash; everyone calls me Zak. Senior software engineer, Georgetown, Texas (Austin area). The fastest way to reach me is a text or a call.</p>
-      <dl class="fl-contact-card">
-        <div>
-          <dt>Phone</dt>
-          <dd><a href="tel:+15124972838">(512) 497-2838</a></dd>
+      <section class="cc" aria-label="Contact card">
+        <div class="cc-photo">
+          <picture>
+            <source srcset="/zak-headshot.webp" type="image/webp" />
+            <img
+              src="/zak-headshot.jpg"
+              width="900"
+              height="1200"
+              alt="Zak Lyons — gray suit, plum tie, a wide smile, in a bright glass atrium. The professional headshot."
+              decoding="async"
+              fetchpriority="high"
+            />
+          </picture>
         </div>
-        <div>
-          <dt>Email</dt>
-          <dd><a href="mailto:zacharylyonstx@gmail.com">zacharylyonstx@gmail.com</a></dd>
+        <div class="cc-body">
+          <p class="cc-eyebrow">Contact card</p>
+          <p class="cc-name">Zak Lyons</p>
+          <p class="cc-role">Senior software engineer &middot; Georgetown, Texas</p>
+          <p class="fl-summary">Zachary Alan Lyons &mdash; everyone calls me Zak. Full-stack, Django/Python and React/TypeScript, seven-plus years shipping products end to end. Austin area, remote-friendly. The fastest way to reach me is a text or a call.</p>
+          <dl class="fl-contact-card">
+            <div>
+              <dt>Phone</dt>
+              <dd><a href="tel:+15124972838">(512) 497-2838</a></dd>
+            </div>
+            <div>
+              <dt>Email</dt>
+              <dd><a href="mailto:zacharylyonstx@gmail.com">zacharylyonstx@gmail.com</a></dd>
+            </div>
+            <div>
+              <dt>Location</dt>
+              <dd>Georgetown, TX &middot; Austin area &middot; remote-friendly</dd>
+            </div>
+            <div>
+              <dt>GitHub</dt>
+              <dd><a href="https://github.com/zacharylyonstx">github.com/zacharylyonstx</a></dd>
+            </div>
+            <div>
+              <dt>LinkedIn</dt>
+              <dd><a href="https://www.linkedin.com/in/zacharylyonstx">linkedin.com/in/zacharylyonstx</a></dd>
+            </div>
+            <div>
+              <dt>YouTube</dt>
+              <dd><a href="https://www.youtube.com/@ZacharyLyonsZak">youtube.com/@ZacharyLyonsZak</a></dd>
+            </div>
+            <div>
+              <dt>Also known as</dt>
+              <dd>Zak Lyons &middot; Zachary Lyons &middot; Zach Lyons &middot; Zachary A. Lyons</dd>
+            </div>
+          </dl>
+          <div class="fl-actions cc-actions">
+            <a class="fl-download cc-primary" href="/downloads/zak-lyons.vcf">Save contact</a>
+            <a class="fl-download" href="sms:+15124972838">Text me</a>
+            <a class="fl-download" href="/downloads/zachary-lyons-resume.pdf">R&eacute;sum&eacute; (PDF)</a>
+          </div>
+          <p class="fl-print-hint">Save contact adds me to your phone&rsquo;s address book, photo included (a vCard).</p>
         </div>
-        <div>
-          <dt>Location</dt>
-          <dd>Georgetown, TX &middot; Austin area &middot; remote-friendly</dd>
-        </div>
-        <div>
-          <dt>GitHub</dt>
-          <dd><a href="https://github.com/zacharylyonstx">github.com/zacharylyonstx</a></dd>
-        </div>
-        <div>
-          <dt>LinkedIn</dt>
-          <dd><a href="https://www.linkedin.com/in/zacharylyonstx">linkedin.com/in/zacharylyonstx</a></dd>
-        </div>
-        <div>
-          <dt>YouTube</dt>
-          <dd><a href="https://www.youtube.com/@ZacharyLyonsZak">youtube.com/@ZacharyLyonsZak</a></dd>
-        </div>
-        <div>
-          <dt>Also known as</dt>
-          <dd>Zak Lyons &middot; Zachary Lyons &middot; Zach Lyons &middot; Zachary A. Lyons</dd>
-        </div>
-      </dl>
+      </section>
     </main>
   </body>
 </html>

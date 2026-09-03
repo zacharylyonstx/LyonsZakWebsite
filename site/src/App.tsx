@@ -10,7 +10,14 @@ import {
   createScrollTimeline,
   type ScrollTimeline,
 } from './timeline/scrollTimeline';
-import { SEGMENTS, segmentProgress, type SegmentName } from './timeline/segments';
+import {
+  SEGMENTS,
+  JOURNEY_PX,
+  segmentProgress,
+  type SegmentName,
+} from './timeline/segments';
+import { dampingFor, dprMaxFor, isCoarsePointer } from './timeline/filmViewport';
+import { ContactCard, type ContactCardHandle } from './contact/ContactCard';
 import { Subtitle } from './film/Subtitle';
 import {
   DrummerPhotoLayer,
@@ -90,13 +97,27 @@ function segmentAt(t: number): SegmentName {
   return names[names.length - 1];
 }
 
-function Header() {
+function Header({ onOpenCard }: { onOpenCard: () => void }) {
   return (
     <header className="fastlane">
-      <div className="fastlane-identity">
-        <p className="fastlane-name">Zak Lyons</p>
-        <p className="fastlane-role">Senior Software Engineer</p>
-      </div>
+      {/* The identity block is the film's contact card (2026-09-03): one
+          tap on the name, anywhere in the journey, opens the card — the suit
+          headshot, the number, the vCard. The amber glint after the name is
+          the site's own "look closer" mark (pocket-glint's language). */}
+      <button
+        type="button"
+        className="fastlane-identity fastlane-identity-btn"
+        onClick={onOpenCard}
+        aria-haspopup="dialog"
+        aria-controls="contact-card-dialog"
+      >
+        <span className="fastlane-name">
+          Zak Lyons
+          <span className="fastlane-glint" aria-hidden="true" />
+        </span>
+        <span className="fastlane-role">Senior Software Engineer</span>
+        <span className="sr-only">— open contact card</span>
+      </button>
       <div className="fastlane-right">
         {/* Ship-pass item 1: the master sound toggle — quiet, in the header,
             discoverable but never nagging. */}
@@ -189,6 +210,7 @@ function DebugReadout({ timeline }: { timeline: ScrollTimeline | null }) {
 
 export default function App() {
   const [timeline, setTimeline] = useState<ScrollTimeline | null>(null);
+  const contactCardRef = useRef<ContactCardHandle>(null);
   const params = useMemo(
     () => new URLSearchParams(window.location.search),
     [],
@@ -197,6 +219,10 @@ export default function App() {
 
   // WebGL availability, probed once — scenes must compose without it
   // (DrummerFallback: same frame, no parallax, no occlusion).
+  // Renderer pixel-ratio cap: phones get 1.5, everything else 2
+  // (filmViewport.ts's rationale). Read once — a pointer doesn't change.
+  const dprMax = useMemo(() => dprMaxFor(isCoarsePointer()), []);
+
   const webgl = useMemo(() => {
     try {
       const probe = document.createElement('canvas');
@@ -267,7 +293,20 @@ export default function App() {
       const d = Number(new URLSearchParams(window.location.search).get('damping'));
       if (Number.isFinite(d) && d > 0) damping = d;
     }
-    const tl = createScrollTimeline(damping ? { damping } : {});
+    // The mobile scroll pass (2026-09-03): the target divides scroll by the
+    // film's FIXED length, never by (scrollHeight − innerHeight) — on a
+    // phone the toolbar's collapse changes innerHeight mid-scroll, which
+    // used to move the film by itself. `.journey` is sized so exactly
+    // JOURNEY_PX of scroll is always reachable (styles.css). A finger gets
+    // the tighter of the two dampings (filmViewport.ts).
+    const coarse = isCoarsePointer();
+    const tl = createScrollTimeline({
+      damping: damping ?? dampingFor(coarse),
+      scrollSource: {
+        scrollY: () => window.scrollY,
+        maxScroll: () => JOURNEY_PX,
+      },
+    });
     setTimeline(tl);
     return () => {
       window.removeEventListener('pagehide', storeY);
@@ -297,7 +336,7 @@ export default function App() {
       {webgl ? (
         <div className="stage" aria-hidden="true">
           <Canvas
-            dpr={[1, 2]}
+            dpr={[1, dprMax]}
             gl={{ antialias: true, alpha: true }}
             camera={{ fov: 38, position: [0, 0, 5] }}
             // R3F's wrapper div sets inline pointerEvents:'auto' by default,
@@ -386,7 +425,7 @@ export default function App() {
       {timeline && (reducedMotion || !webgl) && (
         <NeighborhoodStill timeline={timeline} includeBuild={!webgl} />
       )}
-      <Header />
+      <Header onOpenCard={() => contactCardRef.current?.open()} />
       <NameCard timeline={timeline} reducedMotion={reducedMotion} />
       {/* The occlusion layer — Zak and the kit, ABOVE the type (z2, later
           sibling): the depth-mask signature move. */}
@@ -428,7 +467,14 @@ export default function App() {
           mounted unconditionally: identical DOM in the full, reducedMotion,
           and no-WebGL editions. Under the grain (z3 < z4) like every scene
           layer — the film's surface covers its last card too. */}
-      <KeeperEndCard timeline={timeline} />
+      <KeeperEndCard
+        timeline={timeline}
+        onOpenCard={() => contactCardRef.current?.open()}
+      />
+      {/* The contact card overlay (2026-09-03) — the pocket grammar: holds
+          the journey while open, any scroll closes it, focus is trapped and
+          restored. Above the grain (z30, the pocket-overlay tier). */}
+      <ContactCard ref={contactCardRef} timeline={timeline} />
       <div className="grain" aria-hidden="true" />
       {debug && <DebugReadout timeline={timeline} />}
       {/* The honest scrollbar: the page's real height, nothing hijacked. */}

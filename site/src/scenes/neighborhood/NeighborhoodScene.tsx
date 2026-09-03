@@ -57,6 +57,7 @@ import { RtcPlayLink } from './RtcPlayLink';
 import { anchorOpacity } from '../../pockets/mug';
 import type { PocketHandle } from '../../pockets/Pocket';
 import type { ScrollTimeline } from '../../timeline/scrollTimeline';
+import { filmHeight } from '../../timeline/filmViewport';
 
 export { NEIGHBORHOOD_END };
 
@@ -185,7 +186,7 @@ export function NeighborhoodPhotos({
 
 function viewportAspect(): number {
   if (typeof window === 'undefined') return 16 / 10;
-  return window.innerWidth / Math.max(1, window.innerHeight);
+  return window.innerWidth / Math.max(1, filmHeight());
 }
 
 function debugEnabled(): boolean {
@@ -245,7 +246,7 @@ export function NeighborhoodHeroDom({
       setGlintAt(arrivalGlintAt(viewportAspect()));
       const bloom = bloomRef.current;
       if (bloom) {
-        const a = bloomAnchorPx(window.innerWidth, window.innerHeight);
+        const a = bloomAnchorPx(window.innerWidth, filmHeight());
         bloom.style.left = `${a.x.toFixed(1)}px`;
         bloom.style.top = `${a.y.toFixed(1)}px`;
       }
@@ -312,7 +313,7 @@ export function NeighborhoodHeroDom({
       if (t < STREET[0]) return null;
       // Portrait picks the re-composed tall-frame settle — read per frame so
       // a rotation mid-street recomposes live.
-      const portrait = window.innerWidth < window.innerHeight;
+      const portrait = window.innerWidth < filmHeight();
       return computeArrivalCamera(streetProgress(t), portrait);
     },
     [timeline],
@@ -366,7 +367,7 @@ export function NeighborhoodStill({
   const pocketRef = useRef<PocketHandle>(null);
 
   const [portrait, setPortrait] = useState(
-    () => typeof window !== 'undefined' && window.innerHeight > window.innerWidth,
+    () => typeof window !== 'undefined' && filmHeight() > window.innerWidth,
   );
   const [glintAt, setGlintAt] = useState(() => stillGlintAt(viewportAspect()));
   const glintRefState = useRef(glintAt);
@@ -374,7 +375,7 @@ export function NeighborhoodStill({
 
   useEffect(() => {
     const compute = () => {
-      setPortrait(window.innerHeight > window.innerWidth);
+      setPortrait(filmHeight() > window.innerWidth);
       setGlintAt(stillGlintAt(viewportAspect()));
     };
     compute();

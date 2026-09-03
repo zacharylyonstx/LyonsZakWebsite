@@ -42,6 +42,7 @@ import {
   swingOpacity,
 } from './dadRig';
 import type { ScrollTimeline } from '../../timeline/scrollTimeline';
+import { filmHeight } from '../../timeline/filmViewport';
 
 export { DAD_END };
 
@@ -270,7 +271,7 @@ export function DadFallback({ timeline }: { timeline: ScrollTimeline | null }) {
   useEffect(() => {
     const place = () => {
       const w = window.innerWidth;
-      const h = window.innerHeight;
+      const h = filmHeight();
       const sLay = sparklerLayout(w, h);
       const wLay = swingLayout(w, h);
       if (sparklerRef.current) {

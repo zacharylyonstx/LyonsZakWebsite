@@ -50,6 +50,8 @@ import {
   signOpacity,
 } from './keeperRig';
 import type { ScrollTimeline } from '../../timeline/scrollTimeline';
+import { CONTACT, displayUrl, mailHref, telHref } from '../../contact/facts';
+import { filmHeight } from '../../timeline/filmViewport';
 
 export { KEEPER_END };
 
@@ -430,7 +432,14 @@ export function KeeperPhotos({
  * Space) so a keyboard visitor has a dedicated way to trigger it without
  * needing to leave the page via a real link first.
  */
-export function KeeperEndCard({ timeline }: { timeline: ScrollTimeline | null }) {
+export function KeeperEndCard({
+  timeline,
+  onOpenCard,
+}: {
+  timeline: ScrollTimeline | null;
+  /** Opens the film's contact card (App.tsx) — the medallion's job. */
+  onOpenCard?: () => void;
+}) {
   const cardRef = useRef<HTMLElement>(null);
   const [clicks, setClicks] = useState(0);
   const revealed = shouldRevealPostscript(clicks);
@@ -486,24 +495,55 @@ export function KeeperEndCard({ timeline }: { timeline: ScrollTimeline | null })
         {/* The plain facts, in full — the one place in the film they appear as
             text: the legal name (most people say Zak), where, and how to
             reach him. Real content for a real reader; also what a search
-            engine indexes this page by. */}
-        <p className="end-identity">
-          Zachary Alan Lyons &middot; Senior software engineer &middot; Georgetown, Texas
-        </p>
-        <ul className="end-contact">
-          <li>
-            <a href="tel:+15124972838">(512) 497-2838</a>
-          </li>
-          <li>
-            <a href="mailto:zacharylyonstx@gmail.com">zacharylyonstx@gmail.com</a>
-          </li>
-          <li>
-            <a href="https://github.com/zacharylyonstx">github.com/zacharylyonstx</a>
-          </li>
-          <li>
-            <a href="https://linkedin.com/in/zacharylyonstx">linkedin.com/in/zacharylyonstx</a>
-          </li>
-        </ul>
+            engine indexes this page by. Beside them (2026-09-03): the
+            professional headshot as a small medallion — after the kids, the
+            suit; the register break is the point (the model-expansion law).
+            It opens the contact card. */}
+        <div className="end-identity-row">
+          <button
+            type="button"
+            className="end-medallion"
+            aria-label="Open contact card — the professional headshot"
+            onClick={(e) => {
+              e.stopPropagation(); // not one of the postscript's three clicks
+              onOpenCard?.();
+            }}
+          >
+            <img
+              src={CONTACT.headshotAvatar}
+              srcSet={`${CONTACT.headshotAvatar} 160w, ${CONTACT.headshotSquare} 640w`}
+              sizes="76px"
+              width={76}
+              height={76}
+              alt=""
+              decoding="async"
+            />
+          </button>
+          <div className="end-identity-text">
+            <p className="end-identity">
+              {CONTACT.legalName} &middot; Senior software engineer &middot; {CONTACT.place}
+            </p>
+            <ul className="end-contact">
+              <li>
+                <a href={telHref()}>{CONTACT.phoneDisplay}</a>
+              </li>
+              <li>
+                <a href={mailHref()}>{CONTACT.email}</a>
+              </li>
+              <li>
+                <a href={CONTACT.github}>{displayUrl(CONTACT.github)}</a>
+              </li>
+              <li>
+                <a href={CONTACT.linkedin}>{displayUrl(CONTACT.linkedin)}</a>
+              </li>
+              <li>
+                <a className="end-save" href={CONTACT.vcard}>
+                  Save contact &middot; vCard
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
         <p className="end-lane">
           <a href="/resume">Resume</a>
           <span aria-hidden="true"> · </span>
@@ -533,7 +573,7 @@ export function KeeperFallback({ timeline }: { timeline: ScrollTimeline | null }
   useEffect(() => {
     const place = () => {
       const w = window.innerWidth;
-      const h = window.innerHeight;
+      const h = filmHeight();
       const sLay = signLayout(w, h);
       if (signRef.current) {
         signRef.current.style.left = `${sLay.rect.left.toFixed(1)}px`;

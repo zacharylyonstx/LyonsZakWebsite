@@ -55,7 +55,11 @@
       "additionalName": "Alan",
       "familyName": "Lyons",
       "url": "https://lyonszak.com/",
-      "image": "https://lyonszak.com/og-image.jpg",
+      "image": [
+        "https://lyonszak.com/zak-headshot-sq.jpg",
+        "https://lyonszak.com/zak-headshot.jpg",
+        "https://lyonszak.com/og-image.jpg"
+      ],
       "jobTitle": "Senior Software Engineer",
       "description": "Zak Lyons (Zachary Alan Lyons) is a senior full-stack software engineer in Georgetown, Texas — Django/Python and React/TypeScript, seven-plus years shipping products end to end in healthcare, startups, and legacy modernization — and a dad, drummer, and maker.",
       "telephone": "+1-512-497-2838",
@@ -284,6 +288,27 @@
         color: var(--smoke);
         white-space: nowrap;
       }
+      .fastlane-identity-btn {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        text-align: left;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .fastlane-glint {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        margin: 0 0 0.16em 0.55em;
+        border-radius: 50%;
+        background: var(--amber);
+        box-shadow: 0 0 10px 1px rgba(245, 164, 92, 0.55);
+        vertical-align: middle;
+      }
       .fastlane-nav {
         display: flex;
         flex-wrap: wrap;
@@ -422,10 +447,10 @@
            The links are real and work before any JS runs. -->
       <div class="ground" aria-hidden="true"></div>
       <header class="fastlane">
-        <div class="fastlane-identity">
-          <p class="fastlane-name">Zak Lyons</p>
-          <p class="fastlane-role">Senior Software Engineer</p>
-        </div>
+        <a class="fastlane-identity fastlane-identity-btn" href="/contact">
+          <span class="fastlane-name">Zak Lyons<span class="fastlane-glint" aria-hidden="true"></span></span>
+          <span class="fastlane-role">Senior Software Engineer</span>
+        </a>
         <nav class="fastlane-nav" aria-label="Professional">
           <a href="/resume">Resume</a>
           <a href="/experience">Experience</a>

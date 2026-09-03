@@ -4,4 +4,5 @@
 // Node; this keeps `@types/node` out of a browser-only project.
 declare module 'node:fs' {
   export function readFileSync(path: string | URL, encoding: 'utf8'): string;
+  export function existsSync(path: string | URL): boolean;
 }

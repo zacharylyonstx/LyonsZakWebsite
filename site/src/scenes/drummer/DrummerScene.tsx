@@ -31,6 +31,7 @@ import {
   REST_Z,
 } from './drummerRig';
 import type { ScrollTimeline } from '../../timeline/scrollTimeline';
+import { filmHeight, dprMaxFor, isCoarsePointer } from '../../timeline/filmViewport';
 
 const PHOTO_URL = '/assets/drummer/portrait.jpg';
 const DEPTH_URL = '/assets/drummer/depth.png';
@@ -213,7 +214,7 @@ export function DrummerFrontCanvas({
   return (
     <div className="stage stage-front" aria-hidden="true">
       <Canvas
-        dpr={[1, 2]}
+        dpr={[1, dprMaxFor(isCoarsePointer())]}
         gl={{ antialias: true, alpha: true }}
         camera={{ fov: 38, position: [0, 0, REST_Z] }}
         // Without this, R3F's wrapper re-enables pointer events INSIDE the
@@ -249,7 +250,7 @@ export function DrummerFallback({ timeline }: { timeline: ScrollTimeline | null 
     const place = () => {
       const el = ref.current;
       if (!el) return;
-      const lay = layout(window.innerWidth, window.innerHeight);
+      const lay = layout(window.innerWidth, filmHeight());
       el.style.left = `${lay.rect.left.toFixed(1)}px`;
       el.style.top = `${lay.rect.top.toFixed(1)}px`;
       el.style.width = `${lay.rect.width.toFixed(1)}px`;

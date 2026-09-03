@@ -14,6 +14,7 @@ import type { ScrollTimeline } from '../../timeline/scrollTimeline';
 import { anchorOpacity } from '../../pockets/mug';
 import { RTC_INVITE_CONTENT } from '../../pockets/rtcInvite';
 import { RTC_PLAY_WINDOW, heroLayerOpacity, streetProgress } from './neighborhoodRig';
+import { filmHeight } from '../../timeline/filmViewport';
 
 /** Screen-px below the glint point where the pill's top edge sits. */
 const PILL_DROP_PX = 30;
@@ -51,7 +52,7 @@ export function RtcPlayLink({
       const half = el.offsetWidth / 2;
       const cx = Math.min(Math.max(a.x * w, half + EDGE_PX), w - half - EDGE_PX);
       el.style.left = `${cx.toFixed(1)}px`;
-      el.style.top = `${(a.y * window.innerHeight + PILL_DROP_PX).toFixed(1)}px`;
+      el.style.top = `${(a.y * filmHeight() + PILL_DROP_PX).toFixed(1)}px`;
     };
     apply(timeline.value());
     return timeline.onFrame(apply);

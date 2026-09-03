@@ -20,6 +20,7 @@
 //     scroll); THE NEIGHBORHOOD's rig supplies journeyToCrossingP(t).
 import { memo, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { dprMaxFor, isCoarsePointer } from '../timeline/filmViewport';
 import { Sky } from '@react-three/drei';
 import * as THREE from 'three';
 import type { DirectionalLight, HemisphereLight, AmbientLight } from 'three';
@@ -77,7 +78,10 @@ import { loadCrossingAssets, type CrossingAssets } from './loader';
 
 // ---- The FULL tier's proven constants (see the port note above) -----------
 const MESH_SEGMENTS = 512;
-const DPR_MAX = 2;
+// Phones cap lower (filmViewport.ts): the live world is the film's
+// heaviest frame, and 1.5 on a 3x screen is the difference between a
+// scroll and a slideshow.
+const DPR_MAX = dprMaxFor(isCoarsePointer());
 const PHOTO_ANISOTROPY = 8;
 const SHADOW_MAP_RES = 2048;
 

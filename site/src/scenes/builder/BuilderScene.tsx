@@ -62,6 +62,7 @@ import {
 } from './chatReveal';
 import { builderProgress } from './builderRig';
 import type { ScrollTimeline } from '../../timeline/scrollTimeline';
+import { filmHeight } from '../../timeline/filmViewport';
 
 export { BUILDER_END };
 
@@ -329,7 +330,7 @@ export function BuilderCaptions({
     };
     const apply = (value: number) => {
       const w = window.innerWidth;
-      const h = window.innerHeight;
+      const h = filmHeight();
       const cam = cameraPose(value, reducedMotion);
       (Object.keys(refs) as PanelId[]).forEach((id) => {
         const el = refs[id].current;
@@ -377,7 +378,7 @@ export function BuilderFallback({ timeline }: { timeline: ScrollTimeline | null 
   useEffect(() => {
     const place = () => {
       const w = window.innerWidth;
-      const h = window.innerHeight;
+      const h = filmHeight();
       const refs: Record<PanelId, React.RefObject<HTMLDivElement | null>> = {
         kaelbot: kaelbotRef,
         milieuos: milieuosRef,
