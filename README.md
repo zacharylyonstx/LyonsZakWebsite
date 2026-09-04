@@ -32,7 +32,7 @@ The whole experience is one page and one verb. A damped scroll timeline (17,200p
 | **The Dad** | Penny and Luke. A sparkler at blue hour, a rope swing — depth-mesh photographs that breathe with the camera. |
 | **The Neighborhood** | The signature transition: a real backyard photograph is projected onto the geometry of *Royal Tara Cove*, the family's old cul-de-sac rebuilt as a browser game, and the camera lifts off the photograph into the live world. A visible link plays the real game. |
 | **The Band** | Law By The Gun. A frame from the band's music video, the *Lost in Austin* record (a 30-second excerpt on tap, the whole album embedded from Spotify), and band practice with the kids in the room. |
-| **TeaSpanks** | The music video Zak produced from a song his son improvised in a drive-through — the frame plays a silent excerpt of itself; the real video opens from the frame. |
+| **TeaSpanks** | Luke sang a line in the HTeaO drive-through; Zak fed it to an AI and asked for metal; the three of them shot a music video. The chapter opens on the lyric as a title card, the frame plays a silent excerpt of itself, one pill plays eighteen seconds of the song, the other opens the real video. |
 | **The Weird Ones** | Ghost-hunting hardware he designed and sold (CenTex Paranormal), and a fabricated emergency broadcast playing on a period TV. |
 | **The Keeper** | Hand-carved notes to his kids; then day one (2017, the delivery room) dissolving into Penny, then Luke, on his shoulders now. |
 

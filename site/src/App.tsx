@@ -45,6 +45,7 @@ import {
 import {
   TeaspanksPanel,
   TeaspanksLabel,
+  TeaspanksLyric,
   TeaspanksDiscovery,
   TeaspanksFallback,
 } from './scenes/teaspanks/TeaspanksScene';
@@ -452,7 +453,9 @@ export default function App() {
           unconditionally like BuilderCaptions/RecordAffordance, the same
           reducedMotion||!webgl collapse (the fallback TV projects through
           REST too — WeirdFallback's own convention). */}
-      {/* TEASPANKS's museum label + WATCH pill/pocket (2026-09-01). */}
+      {/* TEASPANKS's title-card lyric, museum label, and the HEAR/WATCH
+          pills + pocket (2026-09-01; the lyric and the song, 2026-09-03). */}
+      <TeaspanksLyric timeline={timeline} />
       <TeaspanksLabel timeline={timeline} reducedMotion={reducedMotion || !webgl} />
       <TeaspanksDiscovery timeline={timeline} reducedMotion={reducedMotion || !webgl} />
       <WeirdLabel timeline={timeline} reducedMotion={reducedMotion || !webgl} />

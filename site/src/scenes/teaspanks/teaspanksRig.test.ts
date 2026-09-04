@@ -8,6 +8,8 @@ import {
   TEASPANKS_END,
   cameraPose,
   labelAnchor,
+  lyricOpacity,
+  lyricRisePx,
   panelLayout,
   panelOpacity,
   pillAnchor,
@@ -40,22 +42,37 @@ describe('seams', () => {
 });
 
 describe('envelopes', () => {
-  it('the frame arrives, holds fully, and is gone before the segment end', () => {
+  it('the lyric owns the dusk first; the frame arrives as it leaves, holds, and is gone before the end', () => {
+    expect(lyricOpacity(START)).toBe(0);
+    expect(lyricOpacity(t(0.2))).toBe(1);
+    expect(lyricOpacity(t(0.3))).toBe(1);
+    expect(lyricOpacity(t(0.5))).toBe(0);
     expect(panelOpacity(START)).toBe(0);
-    expect(panelOpacity(t(0.3))).toBe(1);
+    expect(panelOpacity(t(0.2))).toBe(0);
+    expect(panelOpacity(t(0.55))).toBe(1);
     expect(panelOpacity(t(0.7))).toBe(1);
     expect(panelOpacity(END)).toBe(0);
+    // The lyric is never on top of a fully present frame.
+    for (let b = 0; b <= 1.0001; b += 0.01) {
+      if (panelOpacity(t(b)) === 1) expect(lyricOpacity(t(b))).toBe(0);
+    }
+    // The rise settles to 0 while the lyric holds; pure and reversible.
+    expect(lyricRisePx(t(0.2))).toBe(0);
+    expect(lyricRisePx(START)).toBeGreaterThan(0);
+    expect(lyricRisePx(t(0.25))).toBe(lyricRisePx(t(0.25)));
   });
   it('the pill is only on inside the frame\'s full hold', () => {
     for (let b = 0; b <= 1.0001; b += 0.01) {
       if (pillOpacity(t(b)) > 0) expect(panelOpacity(t(b))).toBe(1);
     }
-    expect(pillOpacity(t(0.5))).toBe(1);
+    expect(pillOpacity(t(0.65))).toBe(1);
   });
-  it('both voice lines play while the frame is fully present', () => {
+  it('three voice lines: the first under the lyric, the other two under the held frame', () => {
     const lines = VOICE_LINES.filter((l) => l.window[0] >= START && l.window[1] <= END);
-    expect(lines.length).toBe(2);
-    for (const l of lines) {
+    expect(lines.length).toBe(3);
+    expect(lyricOpacity(lines[0].window[0])).toBeGreaterThan(0);
+    expect(lyricOpacity(lines[0].window[1])).toBe(1);
+    for (const l of lines.slice(1)) {
       expect(panelOpacity(l.window[0])).toBe(1);
       expect(panelOpacity(l.window[1])).toBe(1);
     }

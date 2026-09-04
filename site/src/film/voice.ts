@@ -125,17 +125,25 @@ export const VOICE_LINES: readonly VoiceLine[] = [
     window: at(S.band, 1375.5, 1623),
   },
 
-  // TEASPANKS (2000px) — the chain told in one breath: the drive-through,
-  // the song, the video. The WATCH pill carries the rest.
+  // TEASPANKS (2000px) — three beats (2026-09-03, from Zak's own retelling:
+  // "he randomly started singing… then I used AI and turned it into a
+  // metal song, and we made a music video to it"): the drive-through (with
+  // the lyric itself on screen as the chapter's title card), the AI, the
+  // months of shooting. The HEAR and WATCH pills carry the rest.
   {
     text: /* ILLUSTRATIVE */
-      'One day Luke made up a song in the HTeaO drive-through.',
-    window: at(S.teaspanks, 200, 760),
+      'One day, in the HTeaO drive-through, Luke made up a song.',
+    window: at(S.teaspanks, 120, 700),
   },
   {
     text: /* ILLUSTRATIVE */
-      'So I produced it — then the three of us shot the music video. It took months.',
-    window: at(S.teaspanks, 880, 1560),
+      'So I fed it to an AI and asked for metal. It obliged.',
+    window: at(S.teaspanks, 1000, 1400),
+  },
+  {
+    text: /* ILLUSTRATIVE */
+      'Then the three of us spent months shooting the music video.',
+    window: at(S.teaspanks, 1420, 1700),
   },
 
   // THE WEIRD ONES (1650px) — unchanged, verified (accuracy-sweep.md #14, #16).

@@ -22,11 +22,35 @@ export const TEASPANKS_CONTENT = {
   embedTitle: 'TeaSpanks — the music video by Luke & Penny, produced by Dad',
   /* ILLUSTRATIVE */
   caption:
-    'Luke sang this, unprompted, in the HTeaO drive-through. I turned it into a song, then the three of us spent months on the video. This is the whole thing — sound on.',
+    'Luke sang the chorus, unprompted, in the HTeaO drive-through. I fed it to an AI and asked for metal; then the three of us spent months on the video. This is the whole thing — sound on.',
   linkHref: `https://www.youtube.com/watch?v=${TEASPANKS_YOUTUBE_ID}`,
   linkLabel: 'OPEN ON YOUTUBE ↗',
   /** The museum label under the frame (portrait gets the short form —
    *  the long one overruns a 390px frame). */
   label: 'TEASPANKS — 2025 · BY LUKE & PENNY · PRODUCED BY DAD',
   labelShort: 'TEASPANKS — 2025 · BY LUKE & PENNY',
+} as const;
+
+/** THE LYRIC — the chapter's title card. Luke's line, as he sang it (Zak,
+ *  2026-09-03: "he randomly started singing tea spanks, tea spanks, mama
+ *  comes out and spanks your butt"); the produced song's own lyric sheet
+ *  (Suno, Feb 2025) reads "Tea Spanks — / Tea Spanks — / Momma comes out /
+ *  And SPANKS. YOUR. BUTT". Real material, not invented dialogue. */
+export const TEASPANKS_LYRIC = {
+  eyebrow: 'Luke · HTeaO drive-through · unprompted',
+  // A non-breaking space keeps the dash on the first line on a phone.
+  lines: ['Tea spanks, tea spanks\u00a0—', 'Momma comes out', 'and spanks your butt.'],
+} as const;
+
+/** THE SONG — an 18-second excerpt of the produced track (the first
+ *  chorus, ~0:26–0:44; fades baked; public/assets/teaspanks/song-excerpt.m4a,
+ *  cut from the master in .recon/final/teaspanks/). The generator's own
+ *  genre tag for it was "dark sinister playful" — quoted verbatim. */
+export const TEASPANKS_SONG = {
+  excerptUrl: '/assets/teaspanks/song-excerpt.m4a',
+  pillLabel: 'Hear the song',
+  pillLabelPlaying: 'Playing — Tea Spanks',
+  pillSub: '18s · tagged “dark, sinister, playful”',
+  ariaLabel: 'Hear the song: an eighteen-second excerpt of Tea Spanks, the metal track made from Luke’s line',
+  ariaLabelPlaying: 'Stop the song',
 } as const;

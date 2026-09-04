@@ -26,6 +26,8 @@ import {
   TEASPANKS_END,
   cameraPose,
   labelAnchor,
+  lyricOpacity,
+  lyricRisePx,
   panelLayout,
   panelOpacity,
   pillAlign,
@@ -36,7 +38,17 @@ import {
 } from './teaspanksRig';
 import { Pocket, type PocketHandle } from '../../pockets/Pocket';
 import { PocketCard, PocketEmbed } from '../../pockets/PocketCard';
-import { TEASPANKS_CONTENT } from '../../pockets/teaspanks';
+import {
+  TEASPANKS_CONTENT,
+  TEASPANKS_LYRIC,
+  TEASPANKS_SONG,
+} from '../../pockets/teaspanks';
+import {
+  STOP_FADE_MS,
+  createRecordPlayerController,
+  fadeValue,
+  onPotentialStopSignal,
+} from '../band/recordPlayer';
 import type { ScrollTimeline } from '../../timeline/scrollTimeline';
 import { filmHeight } from '../../timeline/filmViewport';
 
@@ -184,9 +196,47 @@ export function TeaspanksLabel({
   );
 }
 
-/** The WATCH pill + its pocket (the real video, sound on). Mounted
- *  unconditionally (App.tsx) like every other DOM affordance; the pocket's
- *  own glint stays off-screen — the pill is its control. */
+/** THE LYRIC — the chapter's title card: Luke's line, alone on the dusk
+ *  before the frame arrives (2026-09-03). DOM, centered, opacity + a small
+ *  rise as pure functions of progress (reversible, byte-stable). Real
+ *  material: see TEASPANKS_LYRIC's provenance note. */
+export function TeaspanksLyric({ timeline }: { timeline: ScrollTimeline | null }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!timeline) return;
+    const apply = (value: number) => {
+      const el = ref.current;
+      if (!el) return;
+      const opacity = lyricOpacity(value);
+      el.style.opacity = opacity.toFixed(4);
+      el.style.visibility = opacity > 0.0005 ? 'visible' : 'hidden';
+      el.style.transform = `translate3d(0, ${lyricRisePx(value).toFixed(2)}px, 0)`;
+    };
+    apply(timeline.value());
+    return timeline.onFrame(apply);
+  }, [timeline]);
+  return (
+    <div ref={ref} className="lyric-card" aria-hidden="true">
+      <p className="lyric-eyebrow">{TEASPANKS_LYRIC.eyebrow}</p>
+      <p className="lyric-text">
+        {TEASPANKS_LYRIC.lines.map((line, i) => (
+          <span key={i} className="lyric-line">
+            {line}
+          </span>
+        ))}
+      </p>
+    </div>
+  );
+}
+
+/** The two pills (HEAR the song · WATCH the video) + the song's audio + the
+ *  video's pocket. One projected wrapper carries both pills (a row under the
+ *  frame's right edge in landscape, a centered stack in portrait); its
+ *  opacity is the pill envelope. The song follows THE RECORD's grammar
+ *  exactly (recordPlayer.ts): never autoplay, any scroll input stops it
+ *  with a fade, the journey is never held; opening the video pocket stops
+ *  it first so two players never overlap. Mounted unconditionally
+ *  (App.tsx) like every other DOM affordance. */
 export function TeaspanksDiscovery({
   timeline,
   reducedMotion,
@@ -194,20 +244,71 @@ export function TeaspanksDiscovery({
   timeline: ScrollTimeline | null;
   reducedMotion: boolean;
 }) {
-  const pillRef = useRef<HTMLButtonElement>(null);
+  const groupRef = useRef<HTMLDivElement>(null);
   const pocketRef = useRef<PocketHandle>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const fadeRafRef = useRef<number | null>(null);
+  const [playing, setPlaying] = useState(false);
+
+  const cancelFade = () => {
+    if (fadeRafRef.current != null) {
+      cancelAnimationFrame(fadeRafRef.current);
+      fadeRafRef.current = null;
+    }
+  };
+
+  const controllerRef = useRef(
+    createRecordPlayerController({
+      startAudio: () => {
+        cancelFade();
+        const audio = audioRef.current;
+        if (!audio) return;
+        audio.currentTime = 0;
+        audio.volume = 1;
+        void audio.play().catch(() => {});
+        setPlaying(true);
+      },
+      stopAudio: () => {
+        cancelFade();
+        const audio = audioRef.current;
+        if (!audio || audio.paused) {
+          setPlaying(false);
+          return;
+        }
+        const startVolume = audio.volume;
+        const startedAt = performance.now();
+        const tick = () => {
+          const el = audioRef.current;
+          if (!el) return;
+          const elapsed = performance.now() - startedAt;
+          el.volume = fadeValue(elapsed, STOP_FADE_MS, startVolume, 0);
+          if (elapsed < STOP_FADE_MS) {
+            fadeRafRef.current = requestAnimationFrame(tick);
+          } else {
+            el.pause();
+            el.currentTime = 0;
+            fadeRafRef.current = null;
+          }
+        };
+        fadeRafRef.current = requestAnimationFrame(tick);
+        setPlaying(false);
+      },
+    }),
+  );
+
+  useEffect(() => cancelFade, []);
 
   useEffect(() => {
     if (!timeline) return;
     const apply = (value: number) => {
-      const el = pillRef.current;
+      const el = groupRef.current;
       if (!el) return;
       const opacity = pillOpacity(value);
       const inert = opacity <= 0.05;
       el.style.opacity = opacity.toFixed(4);
       el.style.pointerEvents = inert ? 'none' : 'auto';
-      el.tabIndex = inert ? -1 : 0;
       el.setAttribute('aria-hidden', inert ? 'true' : 'false');
+      for (const b of Array.from(el.querySelectorAll('button'))) b.tabIndex = inert ? -1 : 0;
       if (opacity <= 0.0005) return;
       const w = window.innerWidth;
       const h = filmHeight();
@@ -216,31 +317,85 @@ export function TeaspanksDiscovery({
       el.style.left = `${screen.x.toFixed(1)}px`;
       el.style.top = `${screen.y.toFixed(1)}px`;
       el.style.transform =
-        pillAlign(w, h) === 'right' ? 'translate(-100%, -50%)' : 'translate(-50%, -50%)';
+        pillAlign(w, h) === 'right' ? 'translate(-100%, -50%)' : 'translate(-50%, 0)';
     };
     apply(timeline.value());
     return timeline.onFrame(apply);
   }, [timeline, reducedMotion]);
 
+  // Scroll-away stops the song (listeners exist only while playing).
+  useEffect(() => {
+    if (!playing) return;
+    const onWheel = () => onPotentialStopSignal(controllerRef.current, { kind: 'wheel' });
+    const onTouchMove = () =>
+      onPotentialStopSignal(controllerRef.current, { kind: 'touchmove' });
+    const onKeyDown = (e: KeyboardEvent) =>
+      onPotentialStopSignal(controllerRef.current, { kind: 'key', key: e.key });
+    window.addEventListener('wheel', onWheel, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('touchmove', onTouchMove);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [playing]);
+
+  const toggleSong = () => {
+    if (controllerRef.current.state() === 'playing') controllerRef.current.stop();
+    else controllerRef.current.play();
+  };
+
+  const openVideo = () => {
+    controllerRef.current.stop();
+    pocketRef.current?.open();
+  };
+
   return (
     <>
-      <button
-        ref={pillRef}
-        type="button"
-        className="film-pill teaspanks-watch"
-        aria-label={TEASPANKS_CONTENT.ariaLabel}
-        tabIndex={-1}
+      <audio
+        ref={audioRef}
+        src={TEASPANKS_SONG.excerptUrl}
+        preload="none"
         aria-hidden="true"
-        onClick={() => pocketRef.current?.open()}
-      >
-        <span className="film-pill-row">
-          <span className="film-pill-icon" aria-hidden="true">
-            ▶
+        onEnded={() => controllerRef.current.stop()}
+      />
+      <div ref={groupRef} className="teaspanks-pills" aria-hidden="true">
+        <button
+          type="button"
+          className={`film-pill teaspanks-hear${playing ? ' is-playing' : ''}`}
+          aria-pressed={playing}
+          aria-label={playing ? TEASPANKS_SONG.ariaLabelPlaying : TEASPANKS_SONG.ariaLabel}
+          tabIndex={-1}
+          onClick={toggleSong}
+        >
+          <span className="film-pill-row">
+            <span className="film-pill-icon" aria-hidden="true">
+              {playing ? '■' : '♪'}
+            </span>
+            <span className="film-pill-label">
+              {playing ? TEASPANKS_SONG.pillLabelPlaying : TEASPANKS_SONG.pillLabel}
+            </span>
+            {playing && <span className="film-pill-indicator" aria-hidden="true" />}
           </span>
-          <span className="film-pill-label">{TEASPANKS_CONTENT.pillLabel}</span>
-        </span>
-        <span className="film-pill-sub">{TEASPANKS_CONTENT.pillSub}</span>
-      </button>
+          <span className="film-pill-sub">{TEASPANKS_SONG.pillSub}</span>
+        </button>
+        <button
+          type="button"
+          className="film-pill teaspanks-watch"
+          aria-label={TEASPANKS_CONTENT.ariaLabel}
+          tabIndex={-1}
+          onClick={openVideo}
+        >
+          <span className="film-pill-row">
+            <span className="film-pill-icon" aria-hidden="true">
+              ▶
+            </span>
+            <span className="film-pill-label">{TEASPANKS_CONTENT.pillLabel}</span>
+          </span>
+          <span className="film-pill-sub">{TEASPANKS_CONTENT.pillSub}</span>
+        </button>
+      </div>
       <Pocket
         ref={pocketRef}
         id="teaspanks"

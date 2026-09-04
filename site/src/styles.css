@@ -231,12 +231,18 @@ body {
   justify-content: space-between;
   gap: 16px 28px;
   padding: 26px 34px 44px;
+  /* The scrim: deep enough that the lane reads over the world's daylight
+     skies and the backyard's bright canopy (caught in the 2026-09-03 sweep
+     at the crossing and the backyard, worst on a phone where the lane is
+     two rows tall), still fading to nothing before the frame's content. */
   background: linear-gradient(
     to bottom,
-    rgba(13, 17, 32, 0.82) 0%,
-    rgba(13, 17, 32, 0.45) 55%,
+    rgba(13, 17, 32, 0.9) 0%,
+    rgba(13, 17, 32, 0.66) 50%,
+    rgba(13, 17, 32, 0.28) 80%,
     rgba(13, 17, 32, 0) 100%
   );
+  text-shadow: 0 1px 6px rgba(13, 17, 32, 0.85);
 }
 
 .fastlane-identity {
@@ -351,7 +357,7 @@ body {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
-    padding: 20px 22px 36px;
+    padding: 20px 22px 44px;
   }
 
   .fastlane-identity {
@@ -1492,10 +1498,123 @@ body {
   }
 }
 
-/* TEASPANKS's WATCH pill: left/top mark the projected point; centered on it. */
-.teaspanks-watch {
-  transform: translate(-50%, -50%);
+/* TEASPANKS's pills ride one projected wrapper: HEAR the song · WATCH the
+   video. left/top mark the tracked point; the JS transform aligns the
+   wrapper's right edge to it (landscape) or centers it (portrait). Inside
+   the wrapper the pills are ordinary flow items. */
+.teaspanks-pills {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 6;
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.teaspanks-pills .film-pill {
+  position: static;
+  opacity: 1;
+  pointer-events: inherit;
+  will-change: auto;
+}
+
+.teaspanks-hear.is-playing {
+  border-color: rgba(245, 164, 92, 0.8);
+  background: rgba(13, 17, 32, 0.82);
+}
+
+/* The playing indicator — only in the DOM while the song plays (the
+   record-affordance-indicator precedent: a scroll-only sweep never sees it). */
+.film-pill-indicator {
+  width: 6px;
+  height: 6px;
+  margin-left: 0.5em;
+  border-radius: 50%;
+  background: var(--amber);
+  animation: record-indicator-pulse 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .film-pill-indicator {
+    animation: none;
+  }
+}
+
+@media (max-aspect-ratio: 21/20), (max-width: 719px) {
+  .teaspanks-pills {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+/* ---- TEASPANKS's lyric card (2026-09-03) ---------------------------------
+   Luke's line, alone on the dusk before the video's frame arrives: the
+   chapter's title card, set the way the film sets a voice — Newsreader
+   italic, large, centered — under a mono eyebrow that says who sang it and
+   where. A pure function of progress (opacity + a 14px settle). */
+.lyric-card {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  padding: 0 clamp(22px, 6vw, 120px) clamp(60px, 12vh, 140px);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  will-change: opacity, transform;
+}
+
+.lyric-eyebrow {
+  margin: 0 0 clamp(14px, 2.4vh, 26px);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--smoke);
+  text-shadow: 0 1px 8px rgba(13, 17, 32, 0.85);
+}
+
+.lyric-text {
+  margin: 0;
+  max-width: 14em;
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 380;
+  font-size: clamp(2rem, 5.2vw, 4.4rem);
+  line-height: 1.12;
+  letter-spacing: -0.005em;
+  color: var(--bone);
+  text-shadow:
+    0 0 2px rgba(13, 17, 32, 0.9),
+    0 2px 24px rgba(13, 17, 32, 0.7);
+}
+
+.lyric-line {
+  display: block;
+}
+
+.lyric-line:last-child {
+  color: var(--amber);
+}
+
+@media (max-aspect-ratio: 21/20), (max-width: 719px) {
+  .lyric-card {
+    justify-content: flex-start;
+    padding-top: clamp(150px, 26vh, 240px);
+  }
+
+  .lyric-text {
+    font-size: clamp(2.1rem, 9.5vw, 3.2rem);
+  }
 }
 
 /* Museum labels with a short form for narrow frames (TEASPANKS). */

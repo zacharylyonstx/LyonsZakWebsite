@@ -256,12 +256,18 @@
         justify-content: space-between;
         gap: 16px 28px;
         padding: 26px 34px 44px;
+        /* The scrim: deep enough that the lane reads over the world's daylight
+           skies and the backyard's bright canopy (caught in the 2026-09-03 sweep
+           at the crossing and the backyard, worst on a phone where the lane is
+           two rows tall), still fading to nothing before the frame's content. */
         background: linear-gradient(
           to bottom,
-          rgba(13, 17, 32, 0.82) 0%,
-          rgba(13, 17, 32, 0.45) 55%,
+          rgba(13, 17, 32, 0.9) 0%,
+          rgba(13, 17, 32, 0.66) 50%,
+          rgba(13, 17, 32, 0.28) 80%,
           rgba(13, 17, 32, 0) 100%
         );
+        text-shadow: 0 1px 6px rgba(13, 17, 32, 0.85);
       }
       .fastlane-identity {
         display: flex;
@@ -408,7 +414,7 @@
           flex-direction: column;
           align-items: flex-start;
           gap: 12px;
-          padding: 20px 22px 36px;
+          padding: 20px 22px 44px;
         }
         .fastlane-identity {
           flex-direction: column;

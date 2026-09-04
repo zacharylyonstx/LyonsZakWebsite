@@ -152,12 +152,33 @@ function windowOpacity(p: number, [inStart, inEnd, outStart, outEnd]: FadeWindow
   return clamp01(Math.min(fadeIn, fadeOut));
 }
 
-/** Arrives out of THE BAND's practice dusk, leaves before the segment
- *  end so THE WEIRD ONES's MF-1 rises into clean dusk. */
-const PANEL_FADE: FadeWindow = [0, 0.08, 0.86, 0.96];
-/** The label and the WATCH pill: on through the hold, off before the frame
+/** THE CHAPTER'S THREE BEATS (2026-09-03, Zak's own retelling): the lyric
+ *  Luke sang, alone on the dusk like a title card; the frame of the video
+ *  arriving as the lyric leaves; the two pills (HEAR the song, WATCH the
+ *  video) once the frame holds. The BAND's practice frame has already
+ *  dissolved by the segment start, so the first 700px of this chapter is
+ *  clean dusk + the lyric — the register break the model-expansion law
+ *  asks for, staged as typography before it's staged as a video. */
+const LYRIC_FADE: FadeWindow = [0.05, 0.13, 0.36, 0.44];
+/** The frame arrives as the lyric goes, leaves before the segment end so
+ *  THE WEIRD ONES's MF-1 rises into clean dusk. */
+const PANEL_FADE: FadeWindow = [0.36, 0.48, 0.86, 0.96];
+/** The label and the pills: on through the hold, off before the frame
  *  starts leaving (a pill must never be clickable mid-dissolve). */
-const PILL_FADE: FadeWindow = [0.1, 0.18, 0.8, 0.86];
+const PILL_FADE: FadeWindow = [0.5, 0.58, 0.8, 0.86];
+
+export function lyricOpacity(t: number): number {
+  return windowOpacity(teaspanksProgress(t), LYRIC_FADE);
+}
+
+/** The lyric's rise (px): settles from +14 to 0 as it fades in, drifts on
+ *  to −10 as it fades out — a pure function of progress, reversible. */
+export function lyricRisePx(t: number): number {
+  const p = teaspanksProgress(t);
+  const arrive = smoothstep(LYRIC_FADE[0], LYRIC_FADE[1], p);
+  const leave = smoothstep(LYRIC_FADE[2], LYRIC_FADE[3], p);
+  return 14 * (1 - arrive) - 10 * leave;
+}
 
 export function panelOpacity(t: number): number {
   return windowOpacity(teaspanksProgress(t), PANEL_FADE);
@@ -184,11 +205,12 @@ export function labelAnchor(w: number, h: number): { x: number; y: number; z: nu
   return { x, y, z: 0 };
 }
 
-/** WATCH pill anchor (world). Landscape: the pill's RIGHT edge sits under
- *  the frame's right edge, on the label's own row (the subtitle owns the
- *  lower third — a centered pill collided with it, caught live). Portrait:
- *  centered under the frame (the label is above it there). The component
- *  applies the matching transform (see pillAlign). */
+/** Pill-group anchor (world) — HEAR + WATCH ride one projected point.
+ *  Landscape: the group's RIGHT edge sits under the frame's right edge, on
+ *  the label's own row (the subtitle owns the lower third — a centered
+ *  pill collided with it, caught live). Portrait: centered under the frame
+ *  (the label is above it there), the pills stacked. The component applies
+ *  the matching transform (see pillAlign). */
 export function pillAnchor(w: number, h: number): { x: number; y: number; z: number } {
   const lay = panelLayout(w, h);
   const worldWidth = lay.meshScale;
