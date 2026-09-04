@@ -357,7 +357,21 @@ body {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
-    padding: 20px 22px 44px;
+    padding: 20px 22px 48px;
+    /* Two rows tall here, and the nav sits in the scrim's lower half — hold
+       the scrim longer before it fades (the crossing's daylight sky). */
+    background: linear-gradient(
+      to bottom,
+      rgba(13, 17, 32, 0.92) 0%,
+      rgba(13, 17, 32, 0.84) 58%,
+      rgba(13, 17, 32, 0.5) 82%,
+      rgba(13, 17, 32, 0) 100%
+    );
+  }
+
+  .fastlane-nav a,
+  .sound-toggle {
+    color: #b9c0d1; /* a step up from --smoke for the phone's two-row lane */
   }
 
   .fastlane-identity {
